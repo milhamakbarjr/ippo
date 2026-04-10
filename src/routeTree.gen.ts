@@ -10,13 +10,29 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AssessmentIndexRouteImport } from './routes/assessment/index'
+import { Route as AssessmentResultRouteImport } from './routes/assessment/result'
 import { Route as ApiProgressCompleteRouteImport } from './routes/api/progress/complete'
 import { Route as ApiProgressLevelRouteImport } from './routes/api/progress/$level'
+import { Route as ApiAuthVerifyOtpRouteImport } from './routes/api/auth/verify-otp'
+import { Route as ApiAuthSessionRouteImport } from './routes/api/auth/session'
+import { Route as ApiAuthSendOtpRouteImport } from './routes/api/auth/send-otp'
+import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
 import { Route as ApiAssessmentSubmitRouteImport } from './routes/api/assessment/submit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssessmentIndexRoute = AssessmentIndexRouteImport.update({
+  id: '/assessment/',
+  path: '/assessment/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssessmentResultRoute = AssessmentResultRouteImport.update({
+  id: '/assessment/result',
+  path: '/assessment/result',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiProgressCompleteRoute = ApiProgressCompleteRouteImport.update({
@@ -29,6 +45,26 @@ const ApiProgressLevelRoute = ApiProgressLevelRouteImport.update({
   path: '/api/progress/$level',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthVerifyOtpRoute = ApiAuthVerifyOtpRouteImport.update({
+  id: '/api/auth/verify-otp',
+  path: '/api/auth/verify-otp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSessionRoute = ApiAuthSessionRouteImport.update({
+  id: '/api/auth/session',
+  path: '/api/auth/session',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSendOtpRoute = ApiAuthSendOtpRouteImport.update({
+  id: '/api/auth/send-otp',
+  path: '/api/auth/send-otp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
+  id: '/api/auth/logout',
+  path: '/api/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAssessmentSubmitRoute = ApiAssessmentSubmitRouteImport.update({
   id: '/api/assessment/submit',
   path: '/api/assessment/submit',
@@ -37,20 +73,38 @@ const ApiAssessmentSubmitRoute = ApiAssessmentSubmitRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/assessment/result': typeof AssessmentResultRoute
+  '/assessment/': typeof AssessmentIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/send-otp': typeof ApiAuthSendOtpRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/verify-otp': typeof ApiAuthVerifyOtpRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/assessment/result': typeof AssessmentResultRoute
+  '/assessment': typeof AssessmentIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/send-otp': typeof ApiAuthSendOtpRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/verify-otp': typeof ApiAuthVerifyOtpRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/assessment/result': typeof AssessmentResultRoute
+  '/assessment/': typeof AssessmentIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/send-otp': typeof ApiAuthSendOtpRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/verify-otp': typeof ApiAuthVerifyOtpRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
 }
@@ -58,26 +112,50 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/assessment/result'
+    | '/assessment/'
     | '/api/assessment/submit'
+    | '/api/auth/logout'
+    | '/api/auth/send-otp'
+    | '/api/auth/session'
+    | '/api/auth/verify-otp'
     | '/api/progress/$level'
     | '/api/progress/complete'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/assessment/result'
+    | '/assessment'
     | '/api/assessment/submit'
+    | '/api/auth/logout'
+    | '/api/auth/send-otp'
+    | '/api/auth/session'
+    | '/api/auth/verify-otp'
     | '/api/progress/$level'
     | '/api/progress/complete'
   id:
     | '__root__'
     | '/'
+    | '/assessment/result'
+    | '/assessment/'
     | '/api/assessment/submit'
+    | '/api/auth/logout'
+    | '/api/auth/send-otp'
+    | '/api/auth/session'
+    | '/api/auth/verify-otp'
     | '/api/progress/$level'
     | '/api/progress/complete'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AssessmentResultRoute: typeof AssessmentResultRoute
+  AssessmentIndexRoute: typeof AssessmentIndexRoute
   ApiAssessmentSubmitRoute: typeof ApiAssessmentSubmitRoute
+  ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
+  ApiAuthSendOtpRoute: typeof ApiAuthSendOtpRoute
+  ApiAuthSessionRoute: typeof ApiAuthSessionRoute
+  ApiAuthVerifyOtpRoute: typeof ApiAuthVerifyOtpRoute
   ApiProgressLevelRoute: typeof ApiProgressLevelRoute
   ApiProgressCompleteRoute: typeof ApiProgressCompleteRoute
 }
@@ -89,6 +167,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assessment/': {
+      id: '/assessment/'
+      path: '/assessment'
+      fullPath: '/assessment/'
+      preLoaderRoute: typeof AssessmentIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assessment/result': {
+      id: '/assessment/result'
+      path: '/assessment/result'
+      fullPath: '/assessment/result'
+      preLoaderRoute: typeof AssessmentResultRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/progress/complete': {
@@ -105,6 +197,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiProgressLevelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/verify-otp': {
+      id: '/api/auth/verify-otp'
+      path: '/api/auth/verify-otp'
+      fullPath: '/api/auth/verify-otp'
+      preLoaderRoute: typeof ApiAuthVerifyOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/session': {
+      id: '/api/auth/session'
+      path: '/api/auth/session'
+      fullPath: '/api/auth/session'
+      preLoaderRoute: typeof ApiAuthSessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/send-otp': {
+      id: '/api/auth/send-otp'
+      path: '/api/auth/send-otp'
+      fullPath: '/api/auth/send-otp'
+      preLoaderRoute: typeof ApiAuthSendOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/logout': {
+      id: '/api/auth/logout'
+      path: '/api/auth/logout'
+      fullPath: '/api/auth/logout'
+      preLoaderRoute: typeof ApiAuthLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/assessment/submit': {
       id: '/api/assessment/submit'
       path: '/api/assessment/submit'
@@ -117,7 +237,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AssessmentResultRoute: AssessmentResultRoute,
+  AssessmentIndexRoute: AssessmentIndexRoute,
   ApiAssessmentSubmitRoute: ApiAssessmentSubmitRoute,
+  ApiAuthLogoutRoute: ApiAuthLogoutRoute,
+  ApiAuthSendOtpRoute: ApiAuthSendOtpRoute,
+  ApiAuthSessionRoute: ApiAuthSessionRoute,
+  ApiAuthVerifyOtpRoute: ApiAuthVerifyOtpRoute,
   ApiProgressLevelRoute: ApiProgressLevelRoute,
   ApiProgressCompleteRoute: ApiProgressCompleteRoute,
 }
