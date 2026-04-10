@@ -5,6 +5,7 @@ import {
   boolean,
   timestamp,
   integer,
+  text,
   index,
   unique,
 } from 'drizzle-orm/pg-core';
@@ -103,3 +104,54 @@ export const otp_codes = pgTable('otp_codes', {
 
 export type OtpCode    = typeof otp_codes.$inferSelect;
 export type NewOtpCode = typeof otp_codes.$inferInsert;
+
+// ─── Better Auth Tables ───────────────────────────────────────────────────────
+// These are managed by Better Auth's drizzle adapter.
+// Field names are camelCase to match Better Auth's internal expectations
+// (drizzleAdapter is configured with camelCase: true).
+
+export const ba_user = pgTable('ba_user', {
+  id:            text('id').primaryKey(),
+  name:          varchar('name', { length: 255 }),
+  email:         varchar('email', { length: 255 }).unique().notNull(),
+  emailVerified: boolean('email_verified').default(false).notNull(),
+  image:         varchar('image', { length: 500 }),
+  createdAt:     timestamp('created_at').defaultNow().notNull(),
+  updatedAt:     timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const ba_session = pgTable('ba_session', {
+  id:        text('id').primaryKey(),
+  expiresAt: timestamp('expires_at').notNull(),
+  token:     text('token').unique().notNull(),
+  ipAddress: varchar('ip_address', { length: 100 }),
+  userAgent: text('user_agent'),
+  userId:    text('user_id').notNull().references(() => ba_user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const ba_account = pgTable('ba_account', {
+  id:                     text('id').primaryKey(),
+  accountId:              text('account_id').notNull(),
+  providerId:             text('provider_id').notNull(),
+  userId:                 text('user_id').notNull().references(() => ba_user.id, { onDelete: 'cascade' }),
+  accessToken:            text('access_token'),
+  refreshToken:           text('refresh_token'),
+  idToken:                text('id_token'),
+  accessTokenExpiresAt:   timestamp('access_token_expires_at'),
+  refreshTokenExpiresAt:  timestamp('refresh_token_expires_at'),
+  scope:                  text('scope'),
+  password:               text('password'),
+  createdAt:              timestamp('created_at').defaultNow().notNull(),
+  updatedAt:              timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const ba_verification = pgTable('ba_verification', {
+  id:         text('id').primaryKey(),
+  identifier: text('identifier').notNull(),
+  value:      text('value').notNull(),
+  expiresAt:  timestamp('expires_at').notNull(),
+  createdAt:  timestamp('created_at').defaultNow(),
+  updatedAt:  timestamp('updated_at').defaultNow(),
+});

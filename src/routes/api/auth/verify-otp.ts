@@ -4,6 +4,8 @@ import { users, otp_codes } from '@/db/schema';
 import { VerifyOtpSchema } from '@/db/validators';
 import { eq, and, gt } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
+import { auth } from '@/lib/auth';
+import { serializeSignedCookie } from 'better-call';
 
 export const Route = createFileRoute('/api/auth/verify-otp')({
   server: {
@@ -23,7 +25,7 @@ export const Route = createFileRoute('/api/auth/verify-otp')({
           const { email, otp, mode = 'register' } = parsed.data;
           const now = new Date();
 
-          // Find most recent unused OTP for this email
+          // Find most recent unused, non-expired OTP for this email
           const [storedOtp] = await db
             .select()
             .from(otp_codes)
@@ -53,50 +55,85 @@ export const Route = createFileRoute('/api/auth/verify-otp')({
             );
           }
 
-          // Mark OTP as used
+          // Mark OTP as used immediately (single-use)
           await db
             .update(otp_codes)
             .set({ used: true })
             .where(eq(otp_codes.id, storedOtp.id));
 
-          // Find or create user
-          let [user] = await db
+          // Find or create user in our app table (assessed_level, preferred_language, etc.)
+          let [appUser] = await db
             .select()
             .from(users)
             .where(eq(users.email, email))
             .limit(1);
 
-          if (!user && mode === 'register') {
+          if (!appUser && mode === 'register') {
             const [newUser] = await db
               .insert(users)
               .values({ email })
               .returning();
-            user = newUser;
+            appUser = newUser;
           }
 
-          if (!user) {
+          if (!appUser) {
             return Response.json(
               { error: 'USER_NOT_FOUND', messageId: 'Akun tidak ditemukan. Daftar baru?' },
               { status: 404 }
             );
           }
 
-          // TODO: Create Better Auth session
-          // The session creation depends on how Better Auth exposes createSession.
-          // For now, return the user so the client can proceed.
-          // Full session implementation requires checking Better Auth's API.
+          // Find or create the corresponding Better Auth user record.
+          // BA needs its own user row in ba_user to create sessions.
+          const ctx = await auth.$context;
+          let baUser = await ctx.internalAdapter.findUserByEmail(email);
 
-          return Response.json({
-            success: true,
-            user: {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              language: user.preferred_language ?? 'id',
-              createdAt: user.created_at?.toISOString(),
-              isNew: mode === 'register',
-            },
-          });
+          if (!baUser && mode === 'register') {
+            baUser = await ctx.internalAdapter.createUser({
+              email,
+              name: appUser.name ?? undefined,
+              emailVerified: true, // OTP = email is verified by definition
+            });
+          }
+
+          if (!baUser) {
+            return Response.json(
+              { error: 'USER_NOT_FOUND', messageId: 'Akun tidak ditemukan. Daftar baru?' },
+              { status: 404 }
+            );
+          }
+
+          // Create a Better Auth session
+          const session = await ctx.internalAdapter.createSession(baUser.id ?? (baUser as { user: { id: string } }).user?.id);
+
+          // Sign and serialize the session token cookie
+          // Better Auth uses the 'better-auth.session_token' cookie signed with HMAC
+          const cookieName = ctx.authCookies.sessionToken.name;
+          const cookieAttrs = ctx.authCookies.sessionToken.attributes;
+          const sessionCookie = await serializeSignedCookie(
+            cookieName,
+            session.token,
+            ctx.secret,
+            cookieAttrs,
+          );
+
+          const responseHeaders = new Headers({ 'Content-Type': 'application/json' });
+          responseHeaders.append('Set-Cookie', sessionCookie);
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                language: user.preferred_language ?? 'id',
+                createdAt: user.created_at?.toISOString(),
+                isNew: mode === 'register',
+              },
+            }),
+            { status: 200, headers: responseHeaders }
+          );
         } catch (err) {
           console.error('[verify-otp] error:', err);
           return Response.json(
