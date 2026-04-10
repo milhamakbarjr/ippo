@@ -10,6 +10,7 @@ import { Button } from '@/components/base/buttons/button';
 import { Tab, TabList, TabPanel, Tabs } from '@/components/application/tabs/tabs';
 import { Route } from '@/routes/learning/$level';
 import { useAchievements } from '@/hooks/use-achievements';
+import { getLevelProgress } from '@/utils/guest-progress';
 import kanaLevel from '@/content/kana';
 import n4Level from '@/content/n4';
 import n5Level from '@/content/n5';
@@ -31,19 +32,6 @@ const LEVEL_LABELS: Record<JLPTLevelId, string> = {
   n2: 'N2',
   n1: 'N1',
 };
-
-function getGuestProgress(levelConfig: Level): Record<string, boolean> {
-  const result: Record<string, boolean> = {};
-  try {
-    for (const step of levelConfig.steps) {
-      const key = `ippo_progress_${levelConfig.id}_${step.slug}`;
-      result[step.slug] = localStorage.getItem(key) === 'true';
-    }
-  } catch {
-    // localStorage unavailable
-  }
-  return result;
-}
 
 export function LearningLevelPage() {
   const { level: levelParam } = Route.useParams();
@@ -75,15 +63,9 @@ export function LearningLevelPage() {
     }
   })();
 
-  const progressMap = getGuestProgress(levelConfig);
-
-  const completedSlugs = levelConfig.steps.filter((s) => progressMap[s.slug]).map((s) => s.slug);
-  const completedCount = completedSlugs.length;
-  const totalCount = levelConfig.steps.length;
-  const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+  const guestProgress = getLevelProgress(levelConfig);
+  const { completedSlugs, completedCount, totalCount, progressPercent, recommendedNextSlug } = guestProgress;
   const allComplete = completedCount === totalCount && totalCount > 0;
-
-  const recommendedNextSlug = levelConfig.steps.find((s) => !progressMap[s.slug])?.slug;
 
   const currentLevelIndex = LEVEL_ORDER.indexOf(levelParam as JLPTLevelId);
   const nextLevelId = currentLevelIndex >= 0 && currentLevelIndex < LEVEL_ORDER.length - 1
@@ -164,7 +146,7 @@ export function LearningLevelPage() {
             >
               <StepItem
                 step={step}
-                isCompleted={!!progressMap[step.slug]}
+                isCompleted={completedSlugs.includes(step.slug)}
                 isRecommended={step.slug === recommendedNextSlug}
                 levelId={levelConfig.id}
               />

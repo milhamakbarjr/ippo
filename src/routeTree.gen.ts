@@ -12,11 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LearningIndexRouteImport } from './routes/learning/index'
+import { Route as AssessmentIndexRouteImport } from './routes/assessment/index'
 import { Route as QuizzesSlugRouteImport } from './routes/quizzes/$slug'
 import { Route as LearningLevelRouteImport } from './routes/learning/$level'
 import { Route as AuthVerifyOtpRouteImport } from './routes/auth/verify-otp'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AssessmentResultRouteImport } from './routes/assessment/result'
 import { Route as ApiAchievementsRouteImport } from './routes/api/achievements'
 import { Route as LearningLevelStepSlugRouteImport } from './routes/learning/$level.$stepSlug'
 import { Route as ApiQuizSubmitRouteImport } from './routes/api/quiz/submit'
@@ -45,6 +47,11 @@ const LearningIndexRoute = LearningIndexRouteImport.update({
   path: '/learning/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AssessmentIndexRoute = AssessmentIndexRouteImport.update({
+  id: '/assessment/',
+  path: '/assessment/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuizzesSlugRoute = QuizzesSlugRouteImport.update({
   id: '/quizzes/$slug',
   path: '/quizzes/$slug',
@@ -68,6 +75,11 @@ const AuthRegisterRoute = AuthRegisterRouteImport.update({
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssessmentResultRoute = AssessmentResultRouteImport.update({
+  id: '/assessment/result',
+  path: '/assessment/result',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAchievementsRoute = ApiAchievementsRouteImport.update({
@@ -136,11 +148,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/api/achievements': typeof ApiAchievementsRoute
+  '/assessment/result': typeof AssessmentResultRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-otp': typeof AuthVerifyOtpRoute
   '/learning/$level': typeof LearningLevelRouteWithChildren
   '/quizzes/$slug': typeof QuizzesSlugRoute
+  '/assessment/': typeof AssessmentIndexRoute
   '/learning/': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -158,11 +172,13 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/api/achievements': typeof ApiAchievementsRoute
+  '/assessment/result': typeof AssessmentResultRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-otp': typeof AuthVerifyOtpRoute
   '/learning/$level': typeof LearningLevelRouteWithChildren
   '/quizzes/$slug': typeof QuizzesSlugRoute
+  '/assessment': typeof AssessmentIndexRoute
   '/learning': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -181,11 +197,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/api/achievements': typeof ApiAchievementsRoute
+  '/assessment/result': typeof AssessmentResultRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-otp': typeof AuthVerifyOtpRoute
   '/learning/$level': typeof LearningLevelRouteWithChildren
   '/quizzes/$slug': typeof QuizzesSlugRoute
+  '/assessment/': typeof AssessmentIndexRoute
   '/learning/': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -205,11 +223,13 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/api/achievements'
+    | '/assessment/result'
     | '/auth/login'
     | '/auth/register'
     | '/auth/verify-otp'
     | '/learning/$level'
     | '/quizzes/$slug'
+    | '/assessment/'
     | '/learning/'
     | '/api/assessment/submit'
     | '/api/auth/logout'
@@ -227,11 +247,13 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/api/achievements'
+    | '/assessment/result'
     | '/auth/login'
     | '/auth/register'
     | '/auth/verify-otp'
     | '/learning/$level'
     | '/quizzes/$slug'
+    | '/assessment'
     | '/learning'
     | '/api/assessment/submit'
     | '/api/auth/logout'
@@ -249,11 +271,13 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/api/achievements'
+    | '/assessment/result'
     | '/auth/login'
     | '/auth/register'
     | '/auth/verify-otp'
     | '/learning/$level'
     | '/quizzes/$slug'
+    | '/assessment/'
     | '/learning/'
     | '/api/assessment/submit'
     | '/api/auth/logout'
@@ -272,11 +296,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProfileRoute: typeof ProfileRoute
   ApiAchievementsRoute: typeof ApiAchievementsRoute
+  AssessmentResultRoute: typeof AssessmentResultRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   AuthVerifyOtpRoute: typeof AuthVerifyOtpRoute
   LearningLevelRoute: typeof LearningLevelRouteWithChildren
   QuizzesSlugRoute: typeof QuizzesSlugRoute
+  AssessmentIndexRoute: typeof AssessmentIndexRoute
   LearningIndexRoute: typeof LearningIndexRoute
   ApiAssessmentSubmitRoute: typeof ApiAssessmentSubmitRoute
   ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
@@ -313,6 +339,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearningIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/assessment/': {
+      id: '/assessment/'
+      path: '/assessment'
+      fullPath: '/assessment/'
+      preLoaderRoute: typeof AssessmentIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quizzes/$slug': {
       id: '/quizzes/$slug'
       path: '/quizzes/$slug'
@@ -346,6 +379,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/login'
       fullPath: '/auth/login'
       preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assessment/result': {
+      id: '/assessment/result'
+      path: '/assessment/result'
+      fullPath: '/assessment/result'
+      preLoaderRoute: typeof AssessmentResultRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/achievements': {
@@ -451,11 +491,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProfileRoute: ProfileRoute,
   ApiAchievementsRoute: ApiAchievementsRoute,
+  AssessmentResultRoute: AssessmentResultRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   AuthVerifyOtpRoute: AuthVerifyOtpRoute,
   LearningLevelRoute: LearningLevelRouteWithChildren,
   QuizzesSlugRoute: QuizzesSlugRoute,
+  AssessmentIndexRoute: AssessmentIndexRoute,
   LearningIndexRoute: LearningIndexRoute,
   ApiAssessmentSubmitRoute: ApiAssessmentSubmitRoute,
   ApiAuthLogoutRoute: ApiAuthLogoutRoute,
