@@ -1,5 +1,6 @@
 import { HeadContent, Outlet, ScrollRestoration, createRootRoute } from "@tanstack/react-router";
 import { Scripts } from "@tanstack/react-router";
+import { Toaster } from "sonner";
 import { QueryProvider } from "@/providers/query-provider";
 import { RouteProvider } from "@/providers/router-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -45,6 +46,7 @@ function RootComponent() {
                         </RouteProvider>
                     </QueryProvider>
                 </ThemeProvider>
+                <Toaster position="bottom-center" richColors />
                 <ScrollRestoration />
                 <Scripts />
             </body>
