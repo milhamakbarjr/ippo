@@ -16,6 +16,11 @@ type CompleteStepResponse = {
   xpAwarded: number;
   totalXP: number;
   streak: number;
+  achievementUnlocked?: {
+    slug: string;
+    titleId: string;
+    titleEn: string;
+  } | null;
 };
 
 export function useCompleteStep(userId: string | undefined, level: string) {
@@ -57,10 +62,17 @@ export function useCompleteStep(userId: string | undefined, level: string) {
     onSuccess: (response) => {
       const nextMsg = response.nextStep ? ` Berikutnya: ${response.nextStep}` : '';
       toast.success(`Selamat! +${response.xpAwarded} XP.${nextMsg}`);
+
       if (response.streak > 1) {
+        setTimeout(() => toast.success(`${response.streak}-hari streak! 🔥`), 800);
+      }
+
+      if (response.achievementUnlocked) {
         setTimeout(() => {
-          toast.success(`${response.streak}-hari streak! 🔥`);
-        }, 800);
+          toast.success(`🏆 Achievement Dibuka! ${response.achievementUnlocked!.titleId}`, {
+            duration: 5000,
+          });
+        }, 1500);
       }
     },
 

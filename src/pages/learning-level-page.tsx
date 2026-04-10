@@ -9,6 +9,7 @@ import { Badge } from '@/components/base/badges/badges';
 import { Button } from '@/components/base/buttons/button';
 import { Tab, TabList, TabPanel, Tabs } from '@/components/application/tabs/tabs';
 import { Route } from '@/routes/learning/$level';
+import { useAchievements } from '@/hooks/use-achievements';
 import kanaLevel from '@/content/kana';
 import n4Level from '@/content/n4';
 import n5Level from '@/content/n5';
@@ -48,6 +49,9 @@ export function LearningLevelPage() {
   const { level: levelParam } = Route.useParams();
   const navigate = useNavigate();
   const { data: session } = authClient.useSession();
+  const isAuthenticated = !!session?.user;
+  const { data: achievementsData } = useAchievements(isAuthenticated);
+  const streak = achievementsData?.streak;
 
   const levelConfig = LEVELS[levelParam as JLPTLevelId];
 
@@ -86,7 +90,6 @@ export function LearningLevelPage() {
     ? LEVEL_ORDER[currentLevelIndex + 1]
     : undefined;
 
-  void session;
 
   return (
     <div className="min-h-dvh bg-primary pb-[env(safe-area-inset-bottom)]">
@@ -126,6 +129,7 @@ export function LearningLevelPage() {
               completedCount={completedCount}
               totalCount={totalCount}
               progressPercent={progressPercent}
+              streak={streak}
             />
           ) : (
             <NoAssessmentBanner />
