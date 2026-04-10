@@ -9,6 +9,7 @@ import { Badge } from '@/components/base/badges/badges';
 import { StepResourceLink } from '@/components/application/learning-path/step-resource-link';
 import { ConfettiBurst } from '@/components/application/learning-path/confetti-burst';
 import { Button } from '@/components/base/buttons/button';
+import { QuizPrompt } from '@/components/application/quiz-prompt';
 import { Route } from '@/routes/learning/$level.$stepSlug';
 import { useCompleteStep } from '@/hooks/use-complete-step';
 import { isStepComplete, markStepComplete } from '@/utils/guest-progress';
@@ -21,6 +22,15 @@ const LEVELS: Partial<Record<JLPTLevelId, Level>> = {
   kana: kanaLevel,
   n5: n5Level,
   n4: n4Level,
+};
+
+const LEVEL_QUIZ_SLUGS: Partial<Record<string, string>> = {
+  n5: 'n5-vocab',
+  n4: 'n4-vocab',
+  n3: 'n3-vocab',
+  n2: 'n2-grammar',
+  n1: 'n1-grammar',
+  // kana has no quiz
 };
 
 function track(event: string, data: Record<string, unknown>) {
@@ -37,6 +47,7 @@ export function StepDetailPage() {
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [showXP, setShowXP] = useState(false);
+  const [showQuizPrompt, setShowQuizPrompt] = useState(false);
 
   const mutation = useCompleteStep(user?.id, levelParam);
 
@@ -89,6 +100,7 @@ export function StepDetailPage() {
 
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 800);
+    setShowQuizPrompt(true);
 
     if (user) {
       setShowXP(true);
@@ -186,6 +198,14 @@ export function StepDetailPage() {
             </motion.div>
           )}
         </div>
+
+        {/* Quiz prompt — shown after step completion */}
+        {showQuizPrompt && LEVEL_QUIZ_SLUGS[levelParam] && (
+          <QuizPrompt
+            quizSlug={LEVEL_QUIZ_SLUGS[levelParam]!}
+            onDismiss={() => setShowQuizPrompt(false)}
+          />
+        )}
 
         {/* Navigation buttons */}
         <div
