@@ -38,3 +38,23 @@ export function getLevelProgress(level: Level): {
     recommendedNextSlug,
   };
 }
+
+export function markStepComplete(slug: string): void {
+  try {
+    localStorage.setItem(
+      `step_${slug}`,
+      JSON.stringify({ completed: true, timestamp: Date.now() })
+    );
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      try {
+        sessionStorage.setItem(
+          `step_${slug}`,
+          JSON.stringify({ completed: true, timestamp: Date.now() })
+        );
+      } catch {
+        // Both storages full — silent fail
+      }
+    }
+  }
+}
