@@ -29,11 +29,10 @@ export const Route = createFileRoute("/api/learning/$level/progress")({
                     ),
                 );
 
+                // Better Auth's get-session returns HTTP 200 with { user: null } for
+                // unauthenticated requests, so !sessionRes.ok only catches real server errors.
                 if (!sessionRes.ok) {
-                    return Response.json(
-                        { error: "Unauthorized" },
-                        { status: 401 },
-                    );
+                    return Response.json({ error: "Auth service unavailable" }, { status: 503 });
                 }
 
                 const sessionData = (await sessionRes.json()) as {
