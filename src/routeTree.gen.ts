@@ -13,10 +13,17 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LearningIndexRouteImport } from './routes/learning/index'
 import { Route as LearningLevelRouteImport } from './routes/learning/$level'
+import { Route as AuthVerifyOtpRouteImport } from './routes/auth/verify-otp'
+import { Route as AuthRegisterRouteImport } from './routes/auth/register'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as ApiAchievementsRouteImport } from './routes/api/achievements'
 import { Route as LearningLevelStepSlugRouteImport } from './routes/learning/$level.$stepSlug'
 import { Route as ApiProgressCompleteRouteImport } from './routes/api/progress/complete'
 import { Route as ApiProgressLevelRouteImport } from './routes/api/progress/$level'
+import { Route as ApiAuthVerifyOtpRouteImport } from './routes/api/auth/verify-otp'
+import { Route as ApiAuthSessionRouteImport } from './routes/api/auth/session'
+import { Route as ApiAuthSendOtpRouteImport } from './routes/api/auth/send-otp'
+import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
 import { Route as ApiAssessmentSubmitRouteImport } from './routes/api/assessment/submit'
 import { Route as ApiLearningLevelProgressRouteImport } from './routes/api/learning/$level/progress'
 
@@ -40,6 +47,21 @@ const LearningLevelRoute = LearningLevelRouteImport.update({
   path: '/learning/$level',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthVerifyOtpRoute = AuthVerifyOtpRouteImport.update({
+  id: '/auth/verify-otp',
+  path: '/auth/verify-otp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/auth/register',
+  path: '/auth/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAchievementsRoute = ApiAchievementsRouteImport.update({
   id: '/api/achievements',
   path: '/api/achievements',
@@ -60,6 +82,26 @@ const ApiProgressLevelRoute = ApiProgressLevelRouteImport.update({
   path: '/api/progress/$level',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthVerifyOtpRoute = ApiAuthVerifyOtpRouteImport.update({
+  id: '/api/auth/verify-otp',
+  path: '/api/auth/verify-otp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSessionRoute = ApiAuthSessionRouteImport.update({
+  id: '/api/auth/session',
+  path: '/api/auth/session',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSendOtpRoute = ApiAuthSendOtpRouteImport.update({
+  id: '/api/auth/send-otp',
+  path: '/api/auth/send-otp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
+  id: '/api/auth/logout',
+  path: '/api/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAssessmentSubmitRoute = ApiAssessmentSubmitRouteImport.update({
   id: '/api/assessment/submit',
   path: '/api/assessment/submit',
@@ -76,9 +118,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/api/achievements': typeof ApiAchievementsRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/auth/verify-otp': typeof AuthVerifyOtpRoute
   '/learning/$level': typeof LearningLevelRouteWithChildren
   '/learning/': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/send-otp': typeof ApiAuthSendOtpRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/verify-otp': typeof ApiAuthVerifyOtpRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
@@ -88,9 +137,16 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/api/achievements': typeof ApiAchievementsRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/auth/verify-otp': typeof AuthVerifyOtpRoute
   '/learning/$level': typeof LearningLevelRouteWithChildren
   '/learning': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/send-otp': typeof ApiAuthSendOtpRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/verify-otp': typeof ApiAuthVerifyOtpRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
@@ -101,9 +157,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/api/achievements': typeof ApiAchievementsRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/auth/verify-otp': typeof AuthVerifyOtpRoute
   '/learning/$level': typeof LearningLevelRouteWithChildren
   '/learning/': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/send-otp': typeof ApiAuthSendOtpRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/verify-otp': typeof ApiAuthVerifyOtpRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
@@ -115,9 +178,16 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/api/achievements'
+    | '/auth/login'
+    | '/auth/register'
+    | '/auth/verify-otp'
     | '/learning/$level'
     | '/learning/'
     | '/api/assessment/submit'
+    | '/api/auth/logout'
+    | '/api/auth/send-otp'
+    | '/api/auth/session'
+    | '/api/auth/verify-otp'
     | '/api/progress/$level'
     | '/api/progress/complete'
     | '/learning/$level/$stepSlug'
@@ -127,9 +197,16 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/api/achievements'
+    | '/auth/login'
+    | '/auth/register'
+    | '/auth/verify-otp'
     | '/learning/$level'
     | '/learning'
     | '/api/assessment/submit'
+    | '/api/auth/logout'
+    | '/api/auth/send-otp'
+    | '/api/auth/session'
+    | '/api/auth/verify-otp'
     | '/api/progress/$level'
     | '/api/progress/complete'
     | '/learning/$level/$stepSlug'
@@ -139,9 +216,16 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/api/achievements'
+    | '/auth/login'
+    | '/auth/register'
+    | '/auth/verify-otp'
     | '/learning/$level'
     | '/learning/'
     | '/api/assessment/submit'
+    | '/api/auth/logout'
+    | '/api/auth/send-otp'
+    | '/api/auth/session'
+    | '/api/auth/verify-otp'
     | '/api/progress/$level'
     | '/api/progress/complete'
     | '/learning/$level/$stepSlug'
@@ -152,9 +236,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProfileRoute: typeof ProfileRoute
   ApiAchievementsRoute: typeof ApiAchievementsRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterRoute: typeof AuthRegisterRoute
+  AuthVerifyOtpRoute: typeof AuthVerifyOtpRoute
   LearningLevelRoute: typeof LearningLevelRouteWithChildren
   LearningIndexRoute: typeof LearningIndexRoute
   ApiAssessmentSubmitRoute: typeof ApiAssessmentSubmitRoute
+  ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
+  ApiAuthSendOtpRoute: typeof ApiAuthSendOtpRoute
+  ApiAuthSessionRoute: typeof ApiAuthSessionRoute
+  ApiAuthVerifyOtpRoute: typeof ApiAuthVerifyOtpRoute
   ApiProgressLevelRoute: typeof ApiProgressLevelRoute
   ApiProgressCompleteRoute: typeof ApiProgressCompleteRoute
   ApiLearningLevelProgressRoute: typeof ApiLearningLevelProgressRoute
@@ -190,6 +281,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearningLevelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/verify-otp': {
+      id: '/auth/verify-otp'
+      path: '/auth/verify-otp'
+      fullPath: '/auth/verify-otp'
+      preLoaderRoute: typeof AuthVerifyOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/register': {
+      id: '/auth/register'
+      path: '/auth/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/achievements': {
       id: '/api/achievements'
       path: '/api/achievements'
@@ -216,6 +328,34 @@ declare module '@tanstack/react-router' {
       path: '/api/progress/$level'
       fullPath: '/api/progress/$level'
       preLoaderRoute: typeof ApiProgressLevelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/verify-otp': {
+      id: '/api/auth/verify-otp'
+      path: '/api/auth/verify-otp'
+      fullPath: '/api/auth/verify-otp'
+      preLoaderRoute: typeof ApiAuthVerifyOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/session': {
+      id: '/api/auth/session'
+      path: '/api/auth/session'
+      fullPath: '/api/auth/session'
+      preLoaderRoute: typeof ApiAuthSessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/send-otp': {
+      id: '/api/auth/send-otp'
+      path: '/api/auth/send-otp'
+      fullPath: '/api/auth/send-otp'
+      preLoaderRoute: typeof ApiAuthSendOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/logout': {
+      id: '/api/auth/logout'
+      path: '/api/auth/logout'
+      fullPath: '/api/auth/logout'
+      preLoaderRoute: typeof ApiAuthLogoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/assessment/submit': {
@@ -251,9 +391,16 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProfileRoute: ProfileRoute,
   ApiAchievementsRoute: ApiAchievementsRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterRoute: AuthRegisterRoute,
+  AuthVerifyOtpRoute: AuthVerifyOtpRoute,
   LearningLevelRoute: LearningLevelRouteWithChildren,
   LearningIndexRoute: LearningIndexRoute,
   ApiAssessmentSubmitRoute: ApiAssessmentSubmitRoute,
+  ApiAuthLogoutRoute: ApiAuthLogoutRoute,
+  ApiAuthSendOtpRoute: ApiAuthSendOtpRoute,
+  ApiAuthSessionRoute: ApiAuthSessionRoute,
+  ApiAuthVerifyOtpRoute: ApiAuthVerifyOtpRoute,
   ApiProgressLevelRoute: ApiProgressLevelRoute,
   ApiProgressCompleteRoute: ApiProgressCompleteRoute,
   ApiLearningLevelProgressRoute: ApiLearningLevelProgressRoute,

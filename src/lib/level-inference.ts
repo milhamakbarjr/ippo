@@ -1,6 +1,6 @@
 /**
  * Infer JLPT level from a step slug.
- * Slug naming convention: hiragana-*/katakana-* → kana, n5-* → n5, etc.
+ * Slug naming convention: hiragana-... / katakana-... -> kana, n5-... -> n5, etc.
  * Defaults to 'kana' for unknown slugs.
  */
 export function inferLevelFromSlug(slug: string): string {
