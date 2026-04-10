@@ -9,15 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LearningIndexRouteImport } from './routes/learning/index'
 import { Route as LearningLevelRouteImport } from './routes/learning/$level'
+import { Route as ApiAchievementsRouteImport } from './routes/api/achievements'
 import { Route as LearningLevelStepSlugRouteImport } from './routes/learning/$level.$stepSlug'
 import { Route as ApiProgressCompleteRouteImport } from './routes/api/progress/complete'
 import { Route as ApiProgressLevelRouteImport } from './routes/api/progress/$level'
 import { Route as ApiAssessmentSubmitRouteImport } from './routes/api/assessment/submit'
 import { Route as ApiLearningLevelProgressRouteImport } from './routes/api/learning/$level/progress'
 
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,6 +38,11 @@ const LearningIndexRoute = LearningIndexRouteImport.update({
 const LearningLevelRoute = LearningLevelRouteImport.update({
   id: '/learning/$level',
   path: '/learning/$level',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAchievementsRoute = ApiAchievementsRouteImport.update({
+  id: '/api/achievements',
+  path: '/api/achievements',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearningLevelStepSlugRoute = LearningLevelStepSlugRouteImport.update({
@@ -62,6 +74,8 @@ const ApiLearningLevelProgressRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/profile': typeof ProfileRoute
+  '/api/achievements': typeof ApiAchievementsRoute
   '/learning/$level': typeof LearningLevelRouteWithChildren
   '/learning/': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
@@ -72,6 +86,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/profile': typeof ProfileRoute
+  '/api/achievements': typeof ApiAchievementsRoute
   '/learning/$level': typeof LearningLevelRouteWithChildren
   '/learning': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
@@ -83,6 +99,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/profile': typeof ProfileRoute
+  '/api/achievements': typeof ApiAchievementsRoute
   '/learning/$level': typeof LearningLevelRouteWithChildren
   '/learning/': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
@@ -95,6 +113,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/profile'
+    | '/api/achievements'
     | '/learning/$level'
     | '/learning/'
     | '/api/assessment/submit'
@@ -105,6 +125,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/profile'
+    | '/api/achievements'
     | '/learning/$level'
     | '/learning'
     | '/api/assessment/submit'
@@ -115,6 +137,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/profile'
+    | '/api/achievements'
     | '/learning/$level'
     | '/learning/'
     | '/api/assessment/submit'
@@ -126,6 +150,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProfileRoute: typeof ProfileRoute
+  ApiAchievementsRoute: typeof ApiAchievementsRoute
   LearningLevelRoute: typeof LearningLevelRouteWithChildren
   LearningIndexRoute: typeof LearningIndexRoute
   ApiAssessmentSubmitRoute: typeof ApiAssessmentSubmitRoute
@@ -136,6 +162,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -155,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/learning/$level'
       fullPath: '/learning/$level'
       preLoaderRoute: typeof LearningLevelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/achievements': {
+      id: '/api/achievements'
+      path: '/api/achievements'
+      fullPath: '/api/achievements'
+      preLoaderRoute: typeof ApiAchievementsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learning/$level/$stepSlug': {
@@ -209,6 +249,8 @@ const LearningLevelRouteWithChildren = LearningLevelRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProfileRoute: ProfileRoute,
+  ApiAchievementsRoute: ApiAchievementsRoute,
   LearningLevelRoute: LearningLevelRouteWithChildren,
   LearningIndexRoute: LearningIndexRoute,
   ApiAssessmentSubmitRoute: ApiAssessmentSubmitRoute,
