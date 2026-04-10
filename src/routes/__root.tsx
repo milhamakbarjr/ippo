@@ -1,5 +1,7 @@
 import { HeadContent, Outlet, ScrollRestoration, createRootRoute } from "@tanstack/react-router";
 import { Scripts } from "@tanstack/react-router";
+import { Toaster } from "sonner";
+import { QueryProvider } from "@/providers/query-provider";
 import { RouteProvider } from "@/providers/router-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "@/styles/globals.css";
@@ -38,10 +40,13 @@ function RootComponent() {
                 {/* Inline script prevents dark mode flash on load (FOUC) */}
                 <script dangerouslySetInnerHTML={{ __html: foucScript }} />
                 <ThemeProvider>
-                    <RouteProvider>
-                        <Outlet />
-                    </RouteProvider>
+                    <QueryProvider>
+                        <RouteProvider>
+                            <Outlet />
+                        </RouteProvider>
+                    </QueryProvider>
                 </ThemeProvider>
+                <Toaster position="bottom-center" richColors />
                 <ScrollRestoration />
                 <Scripts />
             </body>
