@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { useNavigate } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@/lib/auth-client';
 import { LevelCompleteCard } from '@/components/application/learning-path/level-complete-card';
 import { NoAssessmentBanner } from '@/components/application/learning-path/no-assessment-banner';
@@ -12,14 +13,20 @@ import { Route } from '@/routes/learning/$level';
 import { useAchievements } from '@/hooks/use-achievements';
 import { getLevelProgress } from '@/utils/guest-progress';
 import kanaLevel from '@/content/kana';
-import n4Level from '@/content/n4';
 import n5Level from '@/content/n5';
-import type { JLPTLevelId, Level } from '@/types/learning';
+import n4Level from '@/content/n4';
+import n3Level from '@/content/n3';
+import n2Level from '@/content/n2';
+import n1Level from '@/content/n1';
+import type { JLPTLevelId, Level, LevelProgressResult } from '@/types/learning';
 
 const LEVELS: Partial<Record<JLPTLevelId, Level>> = {
   kana: kanaLevel,
   n5: n5Level,
   n4: n4Level,
+  n3: n3Level,
+  n2: n2Level,
+  n1: n1Level,
 };
 
 const LEVEL_ORDER: JLPTLevelId[] = ['kana', 'n5', 'n4', 'n3', 'n2', 'n1'];
@@ -43,6 +50,17 @@ export function LearningLevelPage() {
 
   const levelConfig = LEVELS[levelParam as JLPTLevelId];
 
+  // Fetch DB progress for authenticated users
+  const { data: authProgress } = useQuery<LevelProgressResult | null>({
+    queryKey: ['progress', session?.user?.id, levelParam],
+    queryFn: async () => {
+      const res = await fetch(`/api/learning/${levelParam}/progress`);
+      if (!res.ok) return null;
+      return res.json() as Promise<LevelProgressResult>;
+    },
+    enabled: isAuthenticated,
+  });
+
   if (!levelConfig) {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center px-4 pb-[env(safe-area-inset-bottom)]">
@@ -64,7 +82,13 @@ export function LearningLevelPage() {
   })();
 
   const guestProgress = getLevelProgress(levelConfig);
-  const { completedSlugs, completedCount, totalCount, progressPercent, recommendedNextSlug } = guestProgress;
+  const completedSlugs = isAuthenticated
+    ? (authProgress?.steps.filter((s) => s.completed).map((s) => s.slug) ?? [])
+    : guestProgress.completedSlugs;
+  const completedCount = isAuthenticated ? (authProgress?.completedSteps ?? 0) : guestProgress.completedCount;
+  const totalCount = isAuthenticated ? (authProgress?.totalSteps ?? levelConfig.steps.length) : guestProgress.totalCount;
+  const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+  const recommendedNextSlug = isAuthenticated ? authProgress?.recommendedNextStep : guestProgress.recommendedNextSlug;
   const allComplete = completedCount === totalCount && totalCount > 0;
 
   const currentLevelIndex = LEVEL_ORDER.indexOf(levelParam as JLPTLevelId);

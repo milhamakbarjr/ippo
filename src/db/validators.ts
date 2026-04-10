@@ -22,14 +22,20 @@ export const AssessmentSubmitSchema = z.object({
   score:           z.number().int().min(0).max(7),
   total_questions: z.number().int().min(1).max(7),
   completed_at:    z.date().optional(),
+}).refine((d) => d.score <= d.total_questions, {
+  message: 'score cannot exceed total_questions',
+  path: ['score'],
 });
 export type AssessmentSubmit = z.infer<typeof AssessmentSubmitSchema>;
 
 export const QuizSubmitSchema = z.object({
   quiz_slug:       z.string().min(1).max(255),
   level:           JLPTLevelSchema.optional(),
-  score:           z.number().int().min(0),
-  total_questions: z.number().int().min(1),
+  score:           z.number().int().min(0).max(20),
+  total_questions: z.number().int().min(1).max(20),
+}).refine((d) => d.score <= d.total_questions, {
+  message: 'score cannot exceed total_questions',
+  path: ['score'],
 });
 export type QuizSubmit = z.infer<typeof QuizSubmitSchema>;
 

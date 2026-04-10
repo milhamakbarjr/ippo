@@ -24,7 +24,6 @@ const LEVELS: Record<string, Level> = {
 };
 
 const ProgressUpdateSchema = z.object({
-  user_id: z.string().uuid(),
   level: z.enum(['kana', 'n5', 'n4', 'n3', 'n2', 'n1']),
   step_slug: z.string().min(1).max(255),
 });
@@ -71,75 +70,57 @@ export const Route = createFileRoute('/api/progress/complete')({
         if (!parsed.success) {
           return Response.json({ error: parsed.error.message }, { status: 400 });
         }
-        const { user_id, level, step_slug } = parsed.data;
+        const { level, step_slug } = parsed.data;
+        const user_id = appUser.id;
 
-        // 4. Guard: user_id must match app user
-        if (user_id !== appUser.id) {
-          return Response.json({ error: 'Forbidden' }, { status: 403 });
+        // 4–7. Atomically check completion, upsert progress, and award XP in a
+        // single transaction to prevent double-awarding XP on concurrent requests.
+        const { alreadyCompleted, xpAwarded, totalXP } = await db.transaction(async (tx) => {
+          const existing = await tx
+            .select({ completed: progress.completed })
+            .from(progress)
+            .where(and(eq(progress.user_id, user_id), eq(progress.level, level), eq(progress.step_slug, step_slug)))
+            .limit(1);
+          const alreadyCompleted = existing[0]?.completed === true;
+
+          await tx
+            .insert(progress)
+            .values({ user_id, level, step_slug, completed: true, completed_at: new Date() })
+            .onConflictDoUpdate({
+              target: [progress.user_id, progress.level, progress.step_slug],
+              set: { completed: true, completed_at: new Date(), updated_at: new Date() },
+            });
+
+          let xpAwarded = 0;
+          let totalXP = appUser.xp ?? 0;
+          if (!alreadyCompleted) {
+            const [updatedUser] = await tx
+              .update(users)
+              .set({ xp: sql`${users.xp} + 10`, updated_at: new Date() })
+              .where(eq(users.id, user_id))
+              .returning({ xp: users.xp });
+            xpAwarded = 10;
+            totalXP = updatedUser?.xp ?? (totalXP + 10);
+          }
+
+          return { alreadyCompleted, xpAwarded, totalXP };
+        });
+
+        // 8. Update streak — only on new completions to avoid falsely resetting
+        // streaks from duplicate or retried submissions.
+        let newStreak: number;
+        if (alreadyCompleted) {
+          const [u] = await db.select({ streak: users.streak }).from(users).where(eq(users.id, user_id)).limit(1);
+          newStreak = u?.streak ?? 0;
+        } else {
+          newStreak = await updateStreak(user_id);
         }
-
-        // 5. Check if already completed
-        const existing = await db
-          .select({ completed: progress.completed })
-          .from(progress)
-          .where(
-            and(
-              eq(progress.user_id, user_id),
-              eq(progress.level, level),
-              eq(progress.step_slug, step_slug)
-            )
-          )
-          .limit(1);
-        const alreadyCompleted = existing[0]?.completed === true;
-
-        // 6. UPSERT progress
-        await db
-          .insert(progress)
-          .values({ user_id, level, step_slug, completed: true, completed_at: new Date() })
-          .onConflictDoUpdate({
-            target: [progress.user_id, progress.level, progress.step_slug],
-            set: { completed: true, completed_at: new Date(), updated_at: new Date() },
-          });
-
-        // 7. Award XP (only if not previously completed)
-        let xpAwarded = 0;
-        let totalXP = appUser.xp ?? 0;
-        if (!alreadyCompleted) {
-          const [updatedUser] = await db
-            .update(users)
-            .set({ xp: sql`${users.xp} + 10`, updated_at: new Date() })
-            .where(eq(users.id, user_id))
-            .returning({ xp: users.xp });
-          xpAwarded = 10;
-          totalXP = updatedUser?.xp ?? (totalXP + 10);
-        }
-
-        // 8. Update streak
-        const newStreak = await updateStreak(user_id);
 
         // Check achievements (fire synchronously to include in response)
         const unlockedAchievements = await checkAchievements(user_id, level, step_slug, newStreak);
         const firstUnlocked = unlockedAchievements[0];
 
-        // 9. Compute next step from level config
-        const levelConfig = LEVELS[level];
-        let nextStep: string | undefined;
-        if (levelConfig) {
-          const allSlugs = await db
-            .select({ step_slug: progress.step_slug })
-            .from(progress)
-            .where(
-              and(
-                eq(progress.user_id, user_id),
-                eq(progress.level, level),
-                eq(progress.completed, true)
-              )
-            );
-          const completedSet = new Set(allSlugs.map((r) => r.step_slug));
-          nextStep = levelConfig.steps.find((s) => !completedSet.has(s.slug))?.slug;
-        }
-
-        // 10. Level progress counts
+        // 9. Fetch completed steps once — used for next step + level progress
         const completedRows = await db
           .select({ step_slug: progress.step_slug })
           .from(progress)
@@ -150,14 +131,16 @@ export const Route = createFileRoute('/api/progress/complete')({
               eq(progress.completed, true)
             )
           );
-        const levelConfig2 = LEVELS[level];
+        const completedSet = new Set(completedRows.map((r) => r.step_slug));
+        const levelConfig = LEVELS[level];
+        const nextStep = levelConfig?.steps.find((s) => !completedSet.has(s.slug))?.slug;
 
         return Response.json({
           success: true,
           completed_at: new Date().toISOString(),
           levelProgress: {
             completed: completedRows.length,
-            total: levelConfig2?.steps.length ?? 0,
+            total: levelConfig?.steps.length ?? 0,
           },
           nextStep,
           xpAwarded,
