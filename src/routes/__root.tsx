@@ -1,5 +1,6 @@
 import { HeadContent, Outlet, ScrollRestoration, createRootRoute } from "@tanstack/react-router";
 import { Scripts } from "@tanstack/react-router";
+import { AuthProvider } from "@/providers/auth-provider";
 import { RouteProvider } from "@/providers/router-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "@/styles/globals.css";
@@ -38,9 +39,11 @@ function RootComponent() {
                 {/* Inline script prevents dark mode flash on load (FOUC) */}
                 <script dangerouslySetInnerHTML={{ __html: foucScript }} />
                 <ThemeProvider>
-                    <RouteProvider>
-                        <Outlet />
-                    </RouteProvider>
+                    <AuthProvider>
+                        <RouteProvider>
+                            <Outlet />
+                        </RouteProvider>
+                    </AuthProvider>
                 </ThemeProvider>
                 <ScrollRestoration />
                 <Scripts />
