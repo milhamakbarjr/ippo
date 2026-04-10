@@ -10,14 +10,33 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LearningIndexRouteImport } from './routes/learning/index'
+import { Route as LearningLevelRouteImport } from './routes/learning/$level'
+import { Route as LearningLevelStepSlugRouteImport } from './routes/learning/$level.$stepSlug'
 import { Route as ApiProgressCompleteRouteImport } from './routes/api/progress/complete'
 import { Route as ApiProgressLevelRouteImport } from './routes/api/progress/$level'
 import { Route as ApiAssessmentSubmitRouteImport } from './routes/api/assessment/submit'
+import { Route as ApiLearningLevelProgressRouteImport } from './routes/api/learning/$level/progress'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LearningIndexRoute = LearningIndexRouteImport.update({
+  id: '/learning/',
+  path: '/learning/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearningLevelRoute = LearningLevelRouteImport.update({
+  id: '/learning/$level',
+  path: '/learning/$level',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearningLevelStepSlugRoute = LearningLevelStepSlugRouteImport.update({
+  id: '/$stepSlug',
+  path: '/$stepSlug',
+  getParentRoute: () => LearningLevelRoute,
 } as any)
 const ApiProgressCompleteRoute = ApiProgressCompleteRouteImport.update({
   id: '/api/progress/complete',
@@ -34,52 +53,85 @@ const ApiAssessmentSubmitRoute = ApiAssessmentSubmitRouteImport.update({
   path: '/api/assessment/submit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLearningLevelProgressRoute =
+  ApiLearningLevelProgressRouteImport.update({
+    id: '/api/learning/$level/progress',
+    path: '/api/learning/$level/progress',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/learning/$level': typeof LearningLevelRouteWithChildren
+  '/learning/': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
+  '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
+  '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/learning/$level': typeof LearningLevelRouteWithChildren
+  '/learning': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
+  '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
+  '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/learning/$level': typeof LearningLevelRouteWithChildren
+  '/learning/': typeof LearningIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
+  '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
+  '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/learning/$level'
+    | '/learning/'
     | '/api/assessment/submit'
     | '/api/progress/$level'
     | '/api/progress/complete'
+    | '/learning/$level/$stepSlug'
+    | '/api/learning/$level/progress'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/learning/$level'
+    | '/learning'
     | '/api/assessment/submit'
     | '/api/progress/$level'
     | '/api/progress/complete'
+    | '/learning/$level/$stepSlug'
+    | '/api/learning/$level/progress'
   id:
     | '__root__'
     | '/'
+    | '/learning/$level'
+    | '/learning/'
     | '/api/assessment/submit'
     | '/api/progress/$level'
     | '/api/progress/complete'
+    | '/learning/$level/$stepSlug'
+    | '/api/learning/$level/progress'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LearningLevelRoute: typeof LearningLevelRouteWithChildren
+  LearningIndexRoute: typeof LearningIndexRoute
   ApiAssessmentSubmitRoute: typeof ApiAssessmentSubmitRoute
   ApiProgressLevelRoute: typeof ApiProgressLevelRoute
   ApiProgressCompleteRoute: typeof ApiProgressCompleteRoute
+  ApiLearningLevelProgressRoute: typeof ApiLearningLevelProgressRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -90,6 +142,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/learning/': {
+      id: '/learning/'
+      path: '/learning'
+      fullPath: '/learning/'
+      preLoaderRoute: typeof LearningIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learning/$level': {
+      id: '/learning/$level'
+      path: '/learning/$level'
+      fullPath: '/learning/$level'
+      preLoaderRoute: typeof LearningLevelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learning/$level/$stepSlug': {
+      id: '/learning/$level/$stepSlug'
+      path: '/$stepSlug'
+      fullPath: '/learning/$level/$stepSlug'
+      preLoaderRoute: typeof LearningLevelStepSlugRouteImport
+      parentRoute: typeof LearningLevelRoute
     }
     '/api/progress/complete': {
       id: '/api/progress/complete'
@@ -112,14 +185,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAssessmentSubmitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/learning/$level/progress': {
+      id: '/api/learning/$level/progress'
+      path: '/api/learning/$level/progress'
+      fullPath: '/api/learning/$level/progress'
+      preLoaderRoute: typeof ApiLearningLevelProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface LearningLevelRouteChildren {
+  LearningLevelStepSlugRoute: typeof LearningLevelStepSlugRoute
+}
+
+const LearningLevelRouteChildren: LearningLevelRouteChildren = {
+  LearningLevelStepSlugRoute: LearningLevelStepSlugRoute,
+}
+
+const LearningLevelRouteWithChildren = LearningLevelRoute._addFileChildren(
+  LearningLevelRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LearningLevelRoute: LearningLevelRouteWithChildren,
+  LearningIndexRoute: LearningIndexRoute,
   ApiAssessmentSubmitRoute: ApiAssessmentSubmitRoute,
   ApiProgressLevelRoute: ApiProgressLevelRoute,
   ApiProgressCompleteRoute: ApiProgressCompleteRoute,
+  ApiLearningLevelProgressRoute: ApiLearningLevelProgressRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
