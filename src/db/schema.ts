@@ -89,3 +89,17 @@ export type NewQuizResult  = typeof quiz_results.$inferInsert;
 
 export type Achievement    = typeof achievements.$inferSelect;
 export type NewAchievement = typeof achievements.$inferInsert;
+
+// ─── OTP Codes ────────────────────────────────────────────────────────────────
+
+export const otp_codes = pgTable('otp_codes', {
+  id:         uuid('id').primaryKey().defaultRandom(),
+  email:      varchar('email', { length: 255 }).notNull(),
+  otp_hash:   varchar('otp_hash', { length: 255 }).notNull(),
+  expires_at: timestamp('expires_at').notNull(),
+  used:       boolean('used').default(false),
+  created_at: timestamp('created_at').defaultNow(),
+});
+
+export type OtpCode    = typeof otp_codes.$inferSelect;
+export type NewOtpCode = typeof otp_codes.$inferInsert;

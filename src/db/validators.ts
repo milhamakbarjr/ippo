@@ -39,3 +39,20 @@ export const CreateUserSchema = z.object({
   preferred_language: z.enum(['id', 'en']).default('id'),
 });
 export type CreateUser = z.infer<typeof CreateUserSchema>;
+
+// ─── Auth / OTP ───────────────────────────────────────────────────────────────
+
+export const SendOtpSchema = z.object({
+  email:    z.string().email(),
+  name:     z.string().max(255).optional(),
+  language: z.enum(['id', 'en']).optional(),
+  mode:     z.enum(['register', 'login']).default('register'),
+});
+export type SendOtpInput = z.infer<typeof SendOtpSchema>;
+
+export const VerifyOtpSchema = z.object({
+  email: z.string().email(),
+  otp:   z.string().length(6).regex(/^\d{6}$/),
+  mode:  z.enum(['register', 'login']).default('register'),
+});
+export type VerifyOtpInput = z.infer<typeof VerifyOtpSchema>;
