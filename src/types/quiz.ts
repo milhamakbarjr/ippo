@@ -38,6 +38,7 @@ export function calculateQuizScore(
   answers: Record<string, string>
 ): { score: number; total: number; percentage: number } {
   const total = questions.length;
+  if (total === 0) return { score: 0, total: 0, percentage: 0 };
   const score = questions.filter(
     (q) => q.options.find((o) => o.id === answers[q.id])?.isCorrect === true
   ).length;

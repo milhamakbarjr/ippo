@@ -26,6 +26,11 @@ export const Route = createFileRoute('/api/quiz/submit')({
         );
 
         if (!sessionRes.ok) {
+          // Auth service returned a real error (5xx) — propagate rather than silently treating as guest
+          if (sessionRes.status >= 500) {
+            return Response.json({ error: 'Auth service unavailable' }, { status: 503 });
+          }
+          // 4xx from auth = no session = guest path
           return Response.json({ success: true, score, total_questions });
         }
 

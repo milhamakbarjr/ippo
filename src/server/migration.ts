@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { users, progress } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and, isNull } from 'drizzle-orm';
 
 type StepMigration = {
   step_slug: string;
@@ -37,10 +37,11 @@ export async function migrateLocalStorageToAccount(
     const validLevels = ['kana', 'n5', 'n4', 'n3', 'n2', 'n1'];
     const level = payload.assessmentResult.assessedLevel;
     if (validLevels.includes(level)) {
+      // Only set assessed_level if not already set — never overwrite a server-assigned level
       await db
         .update(users)
         .set({ assessed_level: level, updated_at: new Date() })
-        .where(eq(users.id, userId));
+        .where(and(eq(users.id, userId), isNull(users.assessed_level)));
       assessmentMigrated = true;
     }
   }

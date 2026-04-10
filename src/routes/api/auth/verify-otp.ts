@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { db } from '@/db';
 import { users, otp_codes } from '@/db/schema';
 import { VerifyOtpSchema } from '@/db/validators';
-import { eq, and, gt } from 'drizzle-orm';
+import { eq, and, gt, desc } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { auth } from '@/lib/auth';
 import { serializeSignedCookie } from 'better-call';
@@ -22,12 +22,12 @@ export const Route = createFileRoute('/api/auth/verify-otp')({
           const { email, otp, mode = 'register', migrationPayload } = parsed.data;
           const now = new Date();
 
-          // Find most recent unused, non-expired OTP
+          // Find most recent unused, non-expired OTP (desc so resent code wins)
           const [storedOtp] = await db
             .select()
             .from(otp_codes)
             .where(and(eq(otp_codes.email, email), eq(otp_codes.used, false), gt(otp_codes.expires_at, now)))
-            .orderBy(otp_codes.created_at)
+            .orderBy(desc(otp_codes.created_at))
             .limit(1);
 
           if (!storedOtp) {
@@ -36,10 +36,13 @@ export const Route = createFileRoute('/api/auth/verify-otp')({
 
           const isValid = await bcrypt.compare(otp, storedOtp.otp_hash);
           if (!isValid) {
-            return Response.json({ error: 'OTP_INVALID', message: 'Kode tidak valid. Coba lagi' }, { status: 400 });
+            // Invalidate OTP immediately on any failed attempt to prevent brute-force.
+            // User must request a new code to try again.
+            await db.update(otp_codes).set({ used: true }).where(eq(otp_codes.id, storedOtp.id));
+            return Response.json({ error: 'OTP_INVALID', message: 'Kode tidak valid. Kirim ulang kode baru.' }, { status: 400 });
           }
 
-          // Mark OTP as used
+          // Mark OTP as used on success
           await db.update(otp_codes).set({ used: true }).where(eq(otp_codes.id, storedOtp.id));
 
           // Find or create app user

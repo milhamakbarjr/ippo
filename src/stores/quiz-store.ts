@@ -38,7 +38,9 @@ export const useQuizStore = create<QuizStore>((set, get) => ({
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as { currentQuestion: number; answers: Record<string, string> };
-        set({ quizSlug: slug, questions, currentQuestion: parsed.currentQuestion, answers: parsed.answers, showFeedback: false, lastAnswerCorrect: null, scoreResult: null, submitError: null });
+        // Clamp restored index in case question count changed since session was saved
+        const safeIndex = Math.min(Math.max(0, parsed.currentQuestion), Math.max(0, questions.length - 1));
+        set({ quizSlug: slug, questions, currentQuestion: safeIndex, answers: parsed.answers, showFeedback: false, lastAnswerCorrect: null, scoreResult: null, submitError: null });
         return;
       } catch { /* ignore malformed session */ }
     }
@@ -125,6 +127,7 @@ export const useQuizStore = create<QuizStore>((set, get) => ({
         sessionStorage.removeItem(`quiz_session_${state.quizSlug}`);
       }
       return {
+        isSubmitting: false,
         currentQuestion: 0,
         answers: {},
         showFeedback: false,

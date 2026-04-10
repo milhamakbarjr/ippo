@@ -54,7 +54,7 @@ const quiz: QuizContent = {
         { id: 'c', text: 'しか', isCorrect: false },
         { id: 'd', text: 'ほど', isCorrect: false },
       ],
-      explanation: 'Baik "〜ばかりでなく" maupun "〜だけでなく" berarti "tidak hanya〜, tapi juga〜". Keduanya benar secara gramatikal, namun "ばかりでなく" terasa lebih formal/N3. "しか" = hanya (dengan negatif), "ほど" = sejauh/sekira.',
+      explanation: '"〜ばかりでなく" berarti "tidak hanya〜, tapi juga〜" dan merupakan bentuk formal yang diuji di N3. "だけでなく" memiliki makna serupa tapi lebih kasual dan bukan target soal ini. "しか" = hanya (dengan predikat negatif), "ほど" = sejauh/sekira.',
       category: 'grammar',
       level: 'n3',
     },

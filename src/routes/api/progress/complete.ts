@@ -116,8 +116,12 @@ export const Route = createFileRoute('/api/progress/complete')({
           newStreak = await updateStreak(user_id);
         }
 
-        // Check achievements (fire synchronously to include in response)
-        const unlockedAchievements = await checkAchievements(user_id, level, step_slug, newStreak);
+        // Check achievements — only on new completions to avoid spurious grant
+        // attempts on re-submissions (DB unique constraint prevents double-grant,
+        // but skipping here avoids unnecessary write attempts).
+        const unlockedAchievements = alreadyCompleted
+          ? []
+          : await checkAchievements(user_id, level, step_slug, newStreak);
         const firstUnlocked = unlockedAchievements[0];
 
         // 9. Fetch completed steps once — used for next step + level progress
