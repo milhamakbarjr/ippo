@@ -82,14 +82,21 @@ export const achievements = pgTable(
 
 // ─── OTP Codes ────────────────────────────────────────────────────────────────
 
-export const otp_codes = pgTable('otp_codes', {
-  id:         uuid('id').primaryKey().defaultRandom(),
-  email:      varchar('email', { length: 255 }).notNull(),
-  otp_hash:   varchar('otp_hash', { length: 255 }).notNull(),
-  expires_at: timestamp('expires_at').notNull(),
-  used:       boolean('used').default(false),
-  created_at: timestamp('created_at').defaultNow(),
-});
+export const otp_codes = pgTable(
+  'otp_codes',
+  {
+    id:         uuid('id').primaryKey().defaultRandom(),
+    email:      varchar('email', { length: 255 }).notNull(),
+    otp_hash:   varchar('otp_hash', { length: 255 }).notNull(),
+    expires_at: timestamp('expires_at').notNull(),
+    used:       boolean('used').default(false),
+    created_at: timestamp('created_at').defaultNow(),
+  },
+  (table) => [
+    index('idx_otp_email').on(table.email),
+    index('idx_otp_expires_at').on(table.expires_at),
+  ],
+);
 
 // ─── Better Auth Tables ───────────────────────────────────────────────────────
 

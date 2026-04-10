@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { useNavigate } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@/lib/auth-client';
 import { LevelCompleteCard } from '@/components/application/learning-path/level-complete-card';
 import { NoAssessmentBanner } from '@/components/application/learning-path/no-assessment-banner';
@@ -10,15 +11,22 @@ import { Button } from '@/components/base/buttons/button';
 import { Tab, TabList, TabPanel, Tabs } from '@/components/application/tabs/tabs';
 import { Route } from '@/routes/learning/$level';
 import { useAchievements } from '@/hooks/use-achievements';
+import { getLevelProgress } from '@/utils/guest-progress';
 import kanaLevel from '@/content/kana';
-import n4Level from '@/content/n4';
 import n5Level from '@/content/n5';
-import type { JLPTLevelId, Level } from '@/types/learning';
+import n4Level from '@/content/n4';
+import n3Level from '@/content/n3';
+import n2Level from '@/content/n2';
+import n1Level from '@/content/n1';
+import type { JLPTLevelId, Level, LevelProgressResult } from '@/types/learning';
 
 const LEVELS: Partial<Record<JLPTLevelId, Level>> = {
   kana: kanaLevel,
   n5: n5Level,
   n4: n4Level,
+  n3: n3Level,
+  n2: n2Level,
+  n1: n1Level,
 };
 
 const LEVEL_ORDER: JLPTLevelId[] = ['kana', 'n5', 'n4', 'n3', 'n2', 'n1'];
@@ -32,19 +40,6 @@ const LEVEL_LABELS: Record<JLPTLevelId, string> = {
   n1: 'N1',
 };
 
-function getGuestProgress(levelConfig: Level): Record<string, boolean> {
-  const result: Record<string, boolean> = {};
-  try {
-    for (const step of levelConfig.steps) {
-      const key = `ippo_progress_${levelConfig.id}_${step.slug}`;
-      result[step.slug] = localStorage.getItem(key) === 'true';
-    }
-  } catch {
-    // localStorage unavailable
-  }
-  return result;
-}
-
 export function LearningLevelPage() {
   const { level: levelParam } = Route.useParams();
   const navigate = useNavigate();
@@ -54,6 +49,17 @@ export function LearningLevelPage() {
   const streak = achievementsData?.streak;
 
   const levelConfig = LEVELS[levelParam as JLPTLevelId];
+
+  // Fetch DB progress for authenticated users
+  const { data: authProgress } = useQuery<LevelProgressResult | null>({
+    queryKey: ['progress', session?.user?.id, levelParam],
+    queryFn: async () => {
+      const res = await fetch(`/api/learning/${levelParam}/progress`);
+      if (!res.ok) return null;
+      return res.json() as Promise<LevelProgressResult>;
+    },
+    enabled: isAuthenticated,
+  });
 
   if (!levelConfig) {
     return (
@@ -75,15 +81,15 @@ export function LearningLevelPage() {
     }
   })();
 
-  const progressMap = getGuestProgress(levelConfig);
-
-  const completedSlugs = levelConfig.steps.filter((s) => progressMap[s.slug]).map((s) => s.slug);
-  const completedCount = completedSlugs.length;
-  const totalCount = levelConfig.steps.length;
+  const guestProgress = getLevelProgress(levelConfig);
+  const completedSlugs = isAuthenticated
+    ? (authProgress?.steps.filter((s) => s.completed).map((s) => s.slug) ?? [])
+    : guestProgress.completedSlugs;
+  const completedCount = isAuthenticated ? (authProgress?.completedSteps ?? 0) : guestProgress.completedCount;
+  const totalCount = isAuthenticated ? (authProgress?.totalSteps ?? levelConfig.steps.length) : guestProgress.totalCount;
   const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+  const recommendedNextSlug = isAuthenticated ? authProgress?.recommendedNextStep : guestProgress.recommendedNextSlug;
   const allComplete = completedCount === totalCount && totalCount > 0;
-
-  const recommendedNextSlug = levelConfig.steps.find((s) => !progressMap[s.slug])?.slug;
 
   const currentLevelIndex = LEVEL_ORDER.indexOf(levelParam as JLPTLevelId);
   const nextLevelId = currentLevelIndex >= 0 && currentLevelIndex < LEVEL_ORDER.length - 1
@@ -164,7 +170,7 @@ export function LearningLevelPage() {
             >
               <StepItem
                 step={step}
-                isCompleted={!!progressMap[step.slug]}
+                isCompleted={completedSlugs.includes(step.slug)}
                 isRecommended={step.slug === recommendedNextSlug}
                 levelId={levelConfig.id}
               />

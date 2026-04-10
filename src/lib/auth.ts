@@ -3,6 +3,10 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '@/db';
 import { ba_user, ba_session, ba_account, ba_verification } from '@/db/schema';
 
+if (!process.env.BETTER_AUTH_SECRET) {
+  throw new Error('Missing required environment variable: BETTER_AUTH_SECRET');
+}
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
