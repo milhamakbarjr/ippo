@@ -10,33 +10,76 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiProgressCompleteRouteImport } from './routes/api/progress/complete'
+import { Route as ApiProgressLevelRouteImport } from './routes/api/progress/$level'
+import { Route as ApiAssessmentSubmitRouteImport } from './routes/api/assessment/submit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiProgressCompleteRoute = ApiProgressCompleteRouteImport.update({
+  id: '/api/progress/complete',
+  path: '/api/progress/complete',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProgressLevelRoute = ApiProgressLevelRouteImport.update({
+  id: '/api/progress/$level',
+  path: '/api/progress/$level',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAssessmentSubmitRoute = ApiAssessmentSubmitRouteImport.update({
+  id: '/api/assessment/submit',
+  path: '/api/assessment/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
+  '/api/progress/$level': typeof ApiProgressLevelRoute
+  '/api/progress/complete': typeof ApiProgressCompleteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
+  '/api/progress/$level': typeof ApiProgressLevelRoute
+  '/api/progress/complete': typeof ApiProgressCompleteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
+  '/api/progress/$level': typeof ApiProgressLevelRoute
+  '/api/progress/complete': typeof ApiProgressCompleteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/api/assessment/submit'
+    | '/api/progress/$level'
+    | '/api/progress/complete'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/api/assessment/submit'
+    | '/api/progress/$level'
+    | '/api/progress/complete'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/assessment/submit'
+    | '/api/progress/$level'
+    | '/api/progress/complete'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiAssessmentSubmitRoute: typeof ApiAssessmentSubmitRoute
+  ApiProgressLevelRoute: typeof ApiProgressLevelRoute
+  ApiProgressCompleteRoute: typeof ApiProgressCompleteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +91,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/progress/complete': {
+      id: '/api/progress/complete'
+      path: '/api/progress/complete'
+      fullPath: '/api/progress/complete'
+      preLoaderRoute: typeof ApiProgressCompleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/progress/$level': {
+      id: '/api/progress/$level'
+      path: '/api/progress/$level'
+      fullPath: '/api/progress/$level'
+      preLoaderRoute: typeof ApiProgressLevelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/assessment/submit': {
+      id: '/api/assessment/submit'
+      path: '/api/assessment/submit'
+      fullPath: '/api/assessment/submit'
+      preLoaderRoute: typeof ApiAssessmentSubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiAssessmentSubmitRoute: ApiAssessmentSubmitRoute,
+  ApiProgressLevelRoute: ApiProgressLevelRoute,
+  ApiProgressCompleteRoute: ApiProgressCompleteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
