@@ -7,6 +7,7 @@ import {
   integer,
   index,
   unique,
+  text,
 } from 'drizzle-orm/pg-core';
 
 // ─── Users ───────────────────────────────────────────────────────────────────
@@ -79,6 +80,65 @@ export const achievements = pgTable(
   ],
 );
 
+// ─── OTP Codes ────────────────────────────────────────────────────────────────
+
+export const otp_codes = pgTable('otp_codes', {
+  id:         uuid('id').primaryKey().defaultRandom(),
+  email:      varchar('email', { length: 255 }).notNull(),
+  otp_hash:   varchar('otp_hash', { length: 255 }).notNull(),
+  expires_at: timestamp('expires_at').notNull(),
+  used:       boolean('used').default(false),
+  created_at: timestamp('created_at').defaultNow(),
+});
+
+// ─── Better Auth Tables ───────────────────────────────────────────────────────
+
+export const ba_user = pgTable('ba_user', {
+  id:            text('id').primaryKey(),
+  name:          varchar('name', { length: 255 }),
+  email:         varchar('email', { length: 255 }).unique().notNull(),
+  emailVerified: boolean('email_verified').default(false).notNull(),
+  image:         varchar('image', { length: 500 }),
+  createdAt:     timestamp('created_at').defaultNow().notNull(),
+  updatedAt:     timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const ba_session = pgTable('ba_session', {
+  id:        text('id').primaryKey(),
+  expiresAt: timestamp('expires_at').notNull(),
+  token:     text('token').unique().notNull(),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  userId:    text('user_id').notNull().references(() => ba_user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const ba_account = pgTable('ba_account', {
+  id:                     text('id').primaryKey(),
+  accountId:              text('account_id').notNull(),
+  providerId:             text('provider_id').notNull(),
+  userId:                 text('user_id').notNull().references(() => ba_user.id, { onDelete: 'cascade' }),
+  accessToken:            text('access_token'),
+  refreshToken:           text('refresh_token'),
+  idToken:                text('id_token'),
+  accessTokenExpiresAt:   timestamp('access_token_expires_at'),
+  refreshTokenExpiresAt:  timestamp('refresh_token_expires_at'),
+  scope:                  text('scope'),
+  password:               text('password'),
+  createdAt:              timestamp('created_at').defaultNow().notNull(),
+  updatedAt:              timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const ba_verification = pgTable('ba_verification', {
+  id:         text('id').primaryKey(),
+  identifier: text('identifier').notNull(),
+  value:      text('value').notNull(),
+  expiresAt:  timestamp('expires_at').notNull(),
+  createdAt:  timestamp('created_at').defaultNow(),
+  updatedAt:  timestamp('updated_at').defaultNow(),
+});
+
 // ─── Inferred Types ───────────────────────────────────────────────────────────
 
 export type User           = typeof users.$inferSelect;
@@ -92,3 +152,6 @@ export type NewQuizResult  = typeof quiz_results.$inferInsert;
 
 export type Achievement    = typeof achievements.$inferSelect;
 export type NewAchievement = typeof achievements.$inferInsert;
+
+export type OtpCode    = typeof otp_codes.$inferSelect;
+export type NewOtpCode = typeof otp_codes.$inferInsert;

@@ -39,3 +39,26 @@ export const CreateUserSchema = z.object({
   preferred_language: z.enum(['id', 'en']).default('id'),
 });
 export type CreateUser = z.infer<typeof CreateUserSchema>;
+
+export const SendOtpSchema = z.object({
+  email: z.string().email(),
+  mode:  z.enum(['register', 'login']).default('register'),
+});
+export type SendOtp = z.infer<typeof SendOtpSchema>;
+
+export const VerifyOtpSchema = z.object({
+  email: z.string().email(),
+  otp:   z.string().length(6).regex(/^\d{6}$/),
+  mode:  z.enum(['register', 'login']).default('register'),
+  migrationPayload: z.object({
+    assessmentResult: z.object({
+      assessedLevel: z.enum(['kana', 'n5', 'n4', 'n3', 'n2', 'n1']),
+    }).optional(),
+    steps: z.array(z.object({
+      step_slug:    z.string().min(1).max(255),
+      level:        z.enum(['kana', 'n5', 'n4', 'n3', 'n2', 'n1']),
+      completed_at: z.coerce.date(),
+    })).max(200),
+  }).optional(),
+});
+export type VerifyOtp = z.infer<typeof VerifyOtpSchema>;
