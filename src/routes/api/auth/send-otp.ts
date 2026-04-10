@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { db } from '@/db';
 import { otp_codes } from '@/db/schema';
 import { SendOtpSchema } from '@/db/validators';
+import { eq, and } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { Resend } from 'resend';
 
@@ -25,6 +26,13 @@ export const Route = createFileRoute('/api/auth/send-otp')({
           const otp = generateOtp();
           const otpHash = await bcrypt.hash(otp, 10);
           const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+          // Invalidate any existing unused OTPs for this email before issuing a new one
+          // so only the latest code is ever valid (prevents confusion on resend).
+          await db
+            .update(otp_codes)
+            .set({ used: true })
+            .where(and(eq(otp_codes.email, email), eq(otp_codes.used, false)));
 
           await db.insert(otp_codes).values({ email, otp_hash: otpHash, expires_at: expiresAt });
 

@@ -180,7 +180,7 @@ export function QuizPage() {
         {/* Progress */}
         <div className="mb-6">
           <ProgressBarBase
-            value={(currentQuestion / questions.length) * 100}
+            value={((currentQuestion + 1) / questions.length) * 100}
             className="w-full"
           />
           <p className="text-tertiary text-sm mt-1">

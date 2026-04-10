@@ -33,7 +33,7 @@ export async function updateStreak(userId: string): Promise<number> {
 
   await db
     .update(users)
-    .set({ streak: newStreak, last_completion_date: today })
+    .set({ streak: newStreak, last_completion_date: today, updated_at: today })
     .where(eq(users.id, userId));
 
   return newStreak;

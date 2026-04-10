@@ -14,14 +14,20 @@ import { Route } from '@/routes/learning/$level.$stepSlug';
 import { useCompleteStep } from '@/hooks/use-complete-step';
 import { isStepComplete, markStepComplete } from '@/utils/guest-progress';
 import kanaLevel from '@/content/kana';
-import n4Level from '@/content/n4';
 import n5Level from '@/content/n5';
+import n4Level from '@/content/n4';
+import n3Level from '@/content/n3';
+import n2Level from '@/content/n2';
+import n1Level from '@/content/n1';
 import type { JLPTLevelId, Level, LevelProgressResult } from '@/types/learning';
 
 const LEVELS: Partial<Record<JLPTLevelId, Level>> = {
   kana: kanaLevel,
   n5: n5Level,
   n4: n4Level,
+  n3: n3Level,
+  n2: n2Level,
+  n1: n1Level,
 };
 
 const LEVEL_QUIZ_SLUGS: Partial<Record<string, string>> = {
