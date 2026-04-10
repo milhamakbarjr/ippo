@@ -1,13 +1,21 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'motion/react';
+import { authClient } from '@/lib/auth-client';
+import { toast } from '@/lib/toast';
+import { Checkbox } from '@/components/base/checkbox/checkbox';
+import { Badge } from '@/components/base/badges/badges';
 import { StepResourceLink } from '@/components/application/learning-path/step-resource-link';
+import { ConfettiBurst } from '@/components/application/learning-path/confetti-burst';
 import { Button } from '@/components/base/buttons/button';
 import { Route } from '@/routes/learning/$level.$stepSlug';
+import { useCompleteStep } from '@/hooks/use-complete-step';
+import { isStepComplete, markStepComplete } from '@/utils/guest-progress';
 import kanaLevel from '@/content/kana';
 import n4Level from '@/content/n4';
 import n5Level from '@/content/n5';
-import type { JLPTLevelId, Level } from '@/types/learning';
+import type { JLPTLevelId, Level, LevelProgressResult } from '@/types/learning';
 
 const LEVELS: Partial<Record<JLPTLevelId, Level>> = {
   kana: kanaLevel,
@@ -20,29 +28,19 @@ function track(event: string, data: Record<string, unknown>) {
   console.debug('[track]', event, data);
 }
 
-function isStepCompleted(levelId: string, stepSlug: string): boolean {
-  try {
-    return localStorage.getItem(`ippo_progress_${levelId}_${stepSlug}`) === 'true';
-  } catch {
-    return false;
-  }
-}
-
 export function StepDetailPage() {
   const { level: levelParam, stepSlug } = Route.useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showXP, setShowXP] = useState(false);
+
+  const mutation = useCompleteStep(user?.id, levelParam);
 
   const levelConfig = LEVELS[levelParam as JLPTLevelId];
-
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        navigate({ to: '/learning/$level', params: { level: levelParam } });
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [levelParam, navigate]);
 
   if (!levelConfig) {
     return (
@@ -76,9 +74,36 @@ export function StepDetailPage() {
 
   const prevStep = stepIndex > 0 ? levelConfig.steps[stepIndex - 1] : undefined;
   const nextStep = stepIndex < levelConfig.steps.length - 1 ? levelConfig.steps[stepIndex + 1] : undefined;
-  const isCompleted = isStepCompleted(levelParam, stepSlug);
 
   void prevStep;
+
+  // Determine completion state: authenticated users read from TanStack Query cache,
+  // guest users read from localStorage via guest-progress utility.
+  const cachedProgress = queryClient.getQueryData<LevelProgressResult>(['progress', user?.id, levelParam]);
+  const isCompleted = user
+    ? (cachedProgress?.steps.find((s) => s.slug === stepSlug)?.completed ?? false)
+    : isStepComplete(stepSlug);
+
+  function handleComplete() {
+    if (isCompleted) return;
+
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 800);
+
+    if (user) {
+      setShowXP(true);
+      mutation.mutate({ user_id: user.id, level: levelParam, step_slug: stepSlug });
+    } else {
+      markStepComplete(stepSlug);
+      toast.success('Selamat! Progres disimpan di browser ini. Buat akun untuk sinkronisasi.', {
+        duration: 6000,
+        action: {
+          label: 'Daftar Gratis',
+          onClick: () => void navigate({ to: '/auth/register' }),
+        },
+      });
+    }
+  }
 
   return (
     <div className="min-h-dvh bg-primary pb-[env(safe-area-inset-bottom)]">
@@ -133,19 +158,33 @@ export function StepDetailPage() {
           ))}
         </motion.div>
 
-        {/* Completion checkbox (disabled — wired in Sprint 05) */}
-        <div className="flex items-center gap-2 mt-8">
-          <input
-            type="checkbox"
-            id="mark-complete"
-            disabled
-            checked={isCompleted}
-            readOnly
-            className="size-4 cursor-not-allowed opacity-50 accent-[var(--color-bg-brand-solid)]"
-          />
-          <label htmlFor="mark-complete" className="text-secondary text-sm cursor-not-allowed opacity-50">
-            Tandai Selesai
-          </label>
+        {/* Completion section */}
+        <div className="relative mt-8 flex items-center gap-3">
+          <ConfettiBurst show={showConfetti} />
+          <motion.div
+            animate={showConfetti ? { scale: [1, 1.2, 1] } : {}}
+            transition={{ duration: 0.3 }}
+          >
+            <Checkbox
+              isSelected={isCompleted}
+              isDisabled={isCompleted || mutation.isPending}
+              onChange={handleComplete}
+              label="Tandai Selesai"
+              aria-label="Tandai langkah ini selesai"
+            />
+          </motion.div>
+
+          {/* XP flash badge — only for authenticated users */}
+          {user && showXP && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: [0, 1, 1, 0], y: [-8, 0, 0, -8] }}
+              transition={{ duration: 1, times: [0, 0.2, 0.8, 1] }}
+              onAnimationComplete={() => setShowXP(false)}
+            >
+              <Badge color="brand">+10 XP</Badge>
+            </motion.div>
+          )}
         </div>
 
         {/* Navigation buttons */}
