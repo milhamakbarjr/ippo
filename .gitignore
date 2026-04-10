@@ -24,4 +24,8 @@ dist-ssr
 *.sw?
 .env
 
+# Claude Code
 CLAUDE.md
+.claude/
+.agents/
+skills-lock.json
