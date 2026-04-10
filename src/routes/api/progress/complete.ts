@@ -5,6 +5,7 @@ import { progress, users } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { updateStreak } from '@/lib/streak';
+import { checkAchievements } from '@/server/achievements';
 import { level as kanaLevel } from '@/content/kana/index';
 import { level as n5Level } from '@/content/n5/index';
 import { level as n4Level } from '@/content/n4/index';
@@ -116,6 +117,10 @@ export const Route = createFileRoute('/api/progress/complete')({
         // 8. Update streak
         const newStreak = await updateStreak(user_id);
 
+        // Check achievements (fire synchronously to include in response)
+        const unlockedAchievements = await checkAchievements(user_id, level, step_slug, newStreak);
+        const firstUnlocked = unlockedAchievements[0];
+
         // 9. Compute next step from level config
         const levelConfig = LEVELS[level];
         let nextStep: string | undefined;
@@ -158,6 +163,7 @@ export const Route = createFileRoute('/api/progress/complete')({
           xpAwarded,
           totalXP,
           streak: newStreak,
+          achievementUnlocked: firstUnlocked ?? null,
         });
       },
     },
