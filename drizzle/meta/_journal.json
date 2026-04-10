@@ -8,6 +8,20 @@
       "when": 1775822092987,
       "tag": "0000_curious_sphinx",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1775826617854,
+      "tag": "0001_next_the_spike",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775827957273,
+      "tag": "0002_lean_wilson_fisk",
+      "breakpoints": true
     }
   ]
 }
