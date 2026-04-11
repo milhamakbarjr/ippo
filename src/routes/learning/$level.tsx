@@ -1,6 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { LearningLevelPage } from '@/pages/learning-level-page';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/learning/$level')({
-  component: LearningLevelPage,
+  component: () => <Outlet />,
 });
