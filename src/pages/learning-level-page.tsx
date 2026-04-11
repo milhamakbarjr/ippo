@@ -9,7 +9,7 @@ import { YouAreHereCard } from '@/components/application/learning-path/you-are-h
 import { Badge } from '@/components/base/badges/badges';
 import { Button } from '@/components/base/buttons/button';
 import { Tab, TabList, TabPanel, Tabs } from '@/components/application/tabs/tabs';
-import { Route } from '@/routes/learning/$level';
+import { Route } from '@/routes/learning/$level.index';
 import { useAchievements } from '@/hooks/use-achievements';
 import { getLevelProgress } from '@/utils/guest-progress';
 import kanaLevel from '@/content/kana';
