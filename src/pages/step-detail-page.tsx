@@ -13,6 +13,39 @@ import { QuizPrompt } from '@/components/application/quiz-prompt';
 import { Route } from '@/routes/learning/$level.$stepSlug';
 import { useCompleteStep } from '@/hooks/use-complete-step';
 import { isStepComplete, markStepComplete } from '@/utils/guest-progress';
+import type { StepResource } from '@/types/learning';
+
+function getYouTubeVideoId(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === 'www.youtube.com' || parsed.hostname === 'youtube.com') {
+      return parsed.searchParams.get('v');
+    }
+    if (parsed.hostname === 'youtu.be') {
+      return parsed.pathname.slice(1) || null;
+    }
+  } catch { /* invalid URL */ }
+  return null;
+}
+
+function YouTubeEmbed({ resource }: { resource: StepResource }) {
+  const videoId = getYouTubeVideoId(resource.url);
+  if (!videoId) return null;
+  return (
+    <div className="mb-4">
+      <p className="text-secondary text-sm font-medium mb-2">{resource.title}</p>
+      <div className="relative w-full overflow-hidden rounded-xl border border-secondary" style={{ paddingBottom: '56.25%' }}>
+        <iframe
+          className="absolute inset-0 size-full"
+          src={`https://www.youtube.com/embed/${videoId}`}
+          title={resource.title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    </div>
+  );
+}
 import kanaLevel from '@/content/kana';
 import n5Level from '@/content/n5';
 import n4Level from '@/content/n4';
@@ -144,6 +177,14 @@ export function StepDetailPage() {
         {/* Resources section */}
         <h2 className="text-secondary text-xl font-semibold mt-6 mb-3">Sumber Belajar</h2>
 
+        {/* Embeddable YouTube videos */}
+        {step.resources
+          .filter((r) => r.type === 'video' && getYouTubeVideoId(r.url))
+          .map((resource) => (
+            <YouTubeEmbed key={resource.url} resource={resource} />
+          ))}
+
+        {/* External resource links (non-embeddable) */}
         <motion.div
           variants={{
             hidden: {},
@@ -153,27 +194,29 @@ export function StepDetailPage() {
           animate="show"
           className="flex flex-col gap-2 md:flex-row md:flex-wrap"
         >
-          {step.resources.map((resource) => (
-            <motion.div
-              key={resource.url}
-              variants={{
-                hidden: { opacity: 0, y: 6 },
-                show: { opacity: 1, y: 0 },
-              }}
-              className="md:w-auto md:flex-1 md:min-w-[200px]"
-            >
-              <StepResourceLink
-                resource={resource}
-                onTrack={() =>
-                  track('resource_clicked', {
-                    level: levelParam,
-                    step: stepSlug,
-                    resource: resource.url,
-                  })
-                }
-              />
-            </motion.div>
-          ))}
+          {step.resources
+            .filter((r) => !(r.type === 'video' && getYouTubeVideoId(r.url)))
+            .map((resource) => (
+              <motion.div
+                key={resource.url}
+                variants={{
+                  hidden: { opacity: 0, y: 6 },
+                  show: { opacity: 1, y: 0 },
+                }}
+                className="md:w-auto md:flex-1 md:min-w-[200px]"
+              >
+                <StepResourceLink
+                  resource={resource}
+                  onTrack={() =>
+                    track('resource_clicked', {
+                      level: levelParam,
+                      step: stepSlug,
+                      resource: resource.url,
+                    })
+                  }
+                />
+              </motion.div>
+            ))}
         </motion.div>
 
         {/* Completion section */}
