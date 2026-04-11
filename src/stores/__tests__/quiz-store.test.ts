@@ -168,6 +168,8 @@ describe('reset', () => {
     await useQuizStore.getState().submit('user-abc');
     useQuizStore.getState().reset();
     const s = useQuizStore.getState();
+    expect(s.quizSlug).toBeNull();
+    expect(s.questions).toEqual([]);
     expect(s.currentQuestion).toBe(0);
     expect(s.answers).toEqual({});
     expect(s.isSubmitting).toBe(false);

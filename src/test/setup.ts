@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/vitest';
+import { beforeEach } from 'vitest';
 
 // Node.js 22+ ships a partial native localStorage that lacks .clear()
 // and shadows jsdom's proper implementation. Replace both with a full mock.
@@ -14,14 +15,23 @@ function createStorageMock() {
   };
 }
 
+const localStorageMock = createStorageMock();
+const sessionStorageMock = createStorageMock();
+
 Object.defineProperty(globalThis, 'localStorage', {
-  value: createStorageMock(),
+  value: localStorageMock,
   writable: true,
   configurable: true,
 });
 
 Object.defineProperty(globalThis, 'sessionStorage', {
-  value: createStorageMock(),
+  value: sessionStorageMock,
   writable: true,
   configurable: true,
+});
+
+// Clear both storages before every test to prevent cross-test and cross-file bleed
+beforeEach(() => {
+  localStorageMock.clear();
+  sessionStorageMock.clear();
 });

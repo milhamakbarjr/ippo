@@ -127,6 +127,8 @@ export const useQuizStore = create<QuizStore>((set, get) => ({
         sessionStorage.removeItem(`quiz_session_${state.quizSlug}`);
       }
       return {
+        quizSlug: null,
+        questions: [],
         isSubmitting: false,
         currentQuestion: 0,
         answers: {},
