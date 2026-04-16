@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import { CheckCircle } from '@untitledui/icons';
 import { motion } from 'motion/react';
 import { useNavigate } from '@tanstack/react-router';
@@ -51,7 +52,7 @@ export function StepItem({ step, isCompleted, isRecommended, levelId }: StepItem
           <Button
             color="primary"
             size="sm"
-            onClick={(e) => {
+            onClick={(e: MouseEvent<HTMLButtonElement>) => {
               e.stopPropagation();
               handleNavigate();
             }}
