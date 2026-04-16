@@ -20,6 +20,7 @@ import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AssessmentResultRouteImport } from './routes/assessment/result'
 import { Route as ApiAchievementsRouteImport } from './routes/api/achievements'
+import { Route as LearningLevelIndexRouteImport } from './routes/learning/$level.index'
 import { Route as LearningLevelStepSlugRouteImport } from './routes/learning/$level.$stepSlug'
 import { Route as ApiQuizSubmitRouteImport } from './routes/api/quiz/submit'
 import { Route as ApiProgressCompleteRouteImport } from './routes/api/progress/complete'
@@ -86,6 +87,11 @@ const ApiAchievementsRoute = ApiAchievementsRouteImport.update({
   id: '/api/achievements',
   path: '/api/achievements',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LearningLevelIndexRoute = LearningLevelIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LearningLevelRoute,
 } as any)
 const LearningLevelStepSlugRoute = LearningLevelStepSlugRouteImport.update({
   id: '/$stepSlug',
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
+  '/learning/$level/': typeof LearningLevelIndexRoute
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
 }
@@ -176,7 +183,6 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-otp': typeof AuthVerifyOtpRoute
-  '/learning/$level': typeof LearningLevelRouteWithChildren
   '/quizzes/$slug': typeof QuizzesSlugRoute
   '/assessment': typeof AssessmentIndexRoute
   '/learning': typeof LearningIndexRoute
@@ -189,6 +195,7 @@ export interface FileRoutesByTo {
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
+  '/learning/$level': typeof LearningLevelIndexRoute
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
 }
@@ -214,6 +221,7 @@ export interface FileRoutesById {
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
+  '/learning/$level/': typeof LearningLevelIndexRoute
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
 }
@@ -240,6 +248,7 @@ export interface FileRouteTypes {
     | '/api/progress/complete'
     | '/api/quiz/submit'
     | '/learning/$level/$stepSlug'
+    | '/learning/$level/'
     | '/api/learning/$level/progress'
     | '/api/quiz/$slug/history'
   fileRoutesByTo: FileRoutesByTo
@@ -251,7 +260,6 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/auth/verify-otp'
-    | '/learning/$level'
     | '/quizzes/$slug'
     | '/assessment'
     | '/learning'
@@ -264,6 +272,7 @@ export interface FileRouteTypes {
     | '/api/progress/complete'
     | '/api/quiz/submit'
     | '/learning/$level/$stepSlug'
+    | '/learning/$level'
     | '/api/learning/$level/progress'
     | '/api/quiz/$slug/history'
   id:
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/api/progress/complete'
     | '/api/quiz/submit'
     | '/learning/$level/$stepSlug'
+    | '/learning/$level/'
     | '/api/learning/$level/progress'
     | '/api/quiz/$slug/history'
   fileRoutesById: FileRoutesById
@@ -395,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAchievementsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learning/$level/': {
+      id: '/learning/$level/'
+      path: '/'
+      fullPath: '/learning/$level/'
+      preLoaderRoute: typeof LearningLevelIndexRouteImport
+      parentRoute: typeof LearningLevelRoute
+    }
     '/learning/$level/$stepSlug': {
       id: '/learning/$level/$stepSlug'
       path: '/$stepSlug'
@@ -477,10 +494,12 @@ declare module '@tanstack/react-router' {
 
 interface LearningLevelRouteChildren {
   LearningLevelStepSlugRoute: typeof LearningLevelStepSlugRoute
+  LearningLevelIndexRoute: typeof LearningLevelIndexRoute
 }
 
 const LearningLevelRouteChildren: LearningLevelRouteChildren = {
   LearningLevelStepSlugRoute: LearningLevelStepSlugRoute,
+  LearningLevelIndexRoute: LearningLevelIndexRoute,
 }
 
 const LearningLevelRouteWithChildren = LearningLevelRoute._addFileChildren(
