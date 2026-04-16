@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { achievements, progress, users } from '@/db/schema';
+import { achievements, progress } from '@/db/schema';
 import { and, eq, count } from 'drizzle-orm';
 import { getStepsForLevel } from '@/content/index';
 

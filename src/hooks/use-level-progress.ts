@@ -1,4 +1,3 @@
-// @ts-expect-error — @tanstack/react-query will be installed by UI agent
 import { useQuery } from '@tanstack/react-query';
 import type { LevelProgressResult } from '@/types/learning';
 

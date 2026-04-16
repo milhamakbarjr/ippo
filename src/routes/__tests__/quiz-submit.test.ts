@@ -32,7 +32,8 @@ function makeRequest(body: unknown, headers: Record<string, string> = {}) {
   });
 }
 
-function makeChain(value: unknown) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function makeChain(value: unknown): any {
   const t = { then: (r: (v: unknown) => void) => r(value) };
   return new Proxy(t, {
     get(target, prop) {
