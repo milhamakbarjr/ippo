@@ -26,6 +26,8 @@ dist-ssr
 *.sw?
 .env
 .dev.vars
+bun.lock
+bun.lockb
 
 # Claude Code
 CLAUDE.md
