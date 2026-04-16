@@ -1,9 +1,9 @@
 import { ArrowLeft } from "@untitledui/icons";
-import { useNavigate } from "react-router";
+import { useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/base/buttons/button";
 
 export function NotFound() {
-    const router = useNavigate();
+    const router = useRouter();
 
     return (
         <section className="flex min-h-screen items-start bg-primary py-16 md:items-center md:py-24">
@@ -14,14 +14,14 @@ export function NotFound() {
                             <span className="text-md font-semibold text-brand-secondary">404 error</span>
                             <h1 className="text-display-md font-semibold text-primary md:text-display-lg lg:text-display-xl">We can’t find that page</h1>
                         </div>
-                        <p className="text-lg text-tertiary md:text-xl">Sorry, the page you are looking for doesn't exist or has been moved.</p>
+                        <p className="text-lg text-tertiary md:text-xl">Sorry, the page you are looking for doesn’t exist or has been moved.</p>
                     </div>
 
                     <div className="flex flex-col-reverse gap-3 sm:flex-row">
-                        <Button color="secondary" size="xl" iconLeading={ArrowLeft} onClick={() => router(-1)}>
+                        <Button color="secondary" size="xl" iconLeading={ArrowLeft} onClick={() => router.history.back()}>
                             Go back
                         </Button>
-                        <Button size="xl" onClick={() => router(-1)}>
+                        <Button size="xl" onClick={() => router.history.back()}>
                             Take me home
                         </Button>
                     </div>
