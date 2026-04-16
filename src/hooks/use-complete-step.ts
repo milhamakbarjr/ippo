@@ -23,7 +23,7 @@ type CompleteStepResponse = {
   } | null;
 };
 
-export function useCompleteStep(userId: string | undefined, level: string) {
+export function useCompleteStep(_userId: string | undefined, _level: string) {
   const queryClient = useQueryClient();
 
   return useMutation<CompleteStepResponse, Error, CompleteStepArgs>({
