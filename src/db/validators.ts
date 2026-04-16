@@ -22,6 +22,12 @@ export const AssessmentSubmitSchema = z.object({
   score:           z.number().int().min(0).max(7),
   total_questions: z.number().int().min(1).max(7),
   completed_at:    z.date().optional(),
+  onboarding_responses: z.object({
+    source:     z.string().optional(),
+    motivation: z.string().optional(),
+    knowledge:  z.string().optional(),
+    path:       z.enum(['from-scratch', 'find-my-level']).optional(),
+  }).optional(),
 }).refine((d) => d.score <= d.total_questions, {
   message: 'score cannot exceed total_questions',
   path: ['score'],

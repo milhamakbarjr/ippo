@@ -57,9 +57,18 @@ export function VerifyOtpPage() {
         toast.error('Migrasi gagal. Hubungi support jika ini terus terjadi.', { duration: 8000 });
       }
 
-      // Navigate regardless (user is now registered)
-      const targetLevel = data.user.assessed_level ?? 'kana';
-      void navigate({ to: '/learning/$level', params: { level: targetLevel } });
+      // Write assessment signal to localStorage so dashboard gate works
+      if (data.user.assessed_level) {
+        try {
+          localStorage.setItem('assessment_level', data.user.assessed_level);
+          sessionStorage.setItem('user_level', data.user.assessed_level);
+        } catch {
+          // ignore storage errors
+        }
+        void navigate({ to: '/' });
+      } else {
+        void navigate({ to: '/onboarding', search: { step: 'welcome' } });
+      }
     } catch {
       toast.error('Verifikasi gagal. Coba lagi.');
       setIsLoading(false);
