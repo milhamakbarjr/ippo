@@ -59,11 +59,12 @@ export const Route = createFileRoute('/api/auth/verify-otp')({
           const ctx = await auth.$context;
           let baUser = await ctx.internalAdapter.findUserByEmail(email);
           if (!baUser && mode === 'register') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             baUser = await ctx.internalAdapter.createUser({
               email,
-              name: appUser.name ?? undefined,
+              name: appUser.name ?? '',
               emailVerified: true,
-            });
+            }) as any;
           }
           if (!baUser) {
             return Response.json({ error: 'USER_NOT_FOUND', message: 'Akun tidak ditemukan. Daftar baru?' }, { status: 404 });
