@@ -1,6 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { HomeScreen } from "@/pages/home-screen";
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
-export const Route = createFileRoute("/")({
-    component: HomeScreen,
+export const Route = createFileRoute('/')({
+  beforeLoad: () => {
+    try {
+      if (localStorage.getItem('assessment_level')) {
+        throw redirect({ to: '/learning' });
+      }
+    } catch (e) {
+      // Re-throw redirect; ignore localStorage errors
+      if (e && typeof e === 'object' && 'to' in e) throw e;
+    }
+    throw redirect({ to: '/assessment' });
+  },
 });
