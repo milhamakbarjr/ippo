@@ -59,6 +59,7 @@ export const useAssessmentStore = create<AssessmentStore>((set, get) => ({
     try {
       localStorage.setItem('assessment_result', JSON.stringify(result));
       localStorage.setItem('assessment_level', result.assessedLevel);
+      sessionStorage.setItem('user_level', result.assessedLevel);
     } catch {
       // ignore storage errors
     }

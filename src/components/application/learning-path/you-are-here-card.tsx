@@ -29,7 +29,7 @@ export function YouAreHereCard({ level, completedCount, totalCount, progressPerc
         <Button
           color="tertiary"
           size="sm"
-          onClick={() => navigate({ to: '/assessment' })}
+          onClick={() => navigate({ to: '/onboarding', search: { step: 'welcome' } })}
           className="shrink-0"
         >
           Ambil Assessment Ulang
