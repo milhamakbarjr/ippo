@@ -3,7 +3,6 @@ import { useNavigate } from '@tanstack/react-router';
 import { CheckCircle, XCircle, AlertCircle, Star01 } from '@untitledui/icons';
 import { Route } from '@/routes/quizzes/$slug';
 import { useQuiz } from '@/hooks/use-quiz';
-// @ts-expect-error — quiz-store will be created by Agent 1
 import { useQuizStore } from '@/stores/quiz-store';
 import { authClient } from '@/lib/auth-client';
 import { toast } from '@/lib/toast';
