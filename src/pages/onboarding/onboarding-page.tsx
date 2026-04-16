@@ -89,23 +89,20 @@ export function OnboardingPage() {
         const result = submit(questions);
         // Fire-and-forget for authenticated users
         try {
-          const authUser = sessionStorage.getItem('auth_user');
           const onboardingRaw = localStorage.getItem('onboarding_responses');
           const onboardingResponses = onboardingRaw
             ? (JSON.parse(onboardingRaw) as Record<string, string>)
             : undefined;
-          if (authUser) {
-            fetch('/api/assessment/submit', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                assessed_level: result.assessedLevel,
-                score: result.score,
-                total_questions: questions.length,
-                ...(onboardingResponses ? { onboarding_responses: onboardingResponses } : {}),
-              }),
-            }).catch(() => { /* non-blocking */ });
-          }
+          fetch('/api/assessment/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              assessed_level: result.assessedLevel,
+              score: result.score,
+              total_questions: questions.length,
+              ...(onboardingResponses ? { onboarding_responses: onboardingResponses } : {}),
+            }),
+          }).catch(() => { /* non-blocking */ });
         } catch { /* ignore */ }
         void navigate({ to: '/', replace: true });
       } else {

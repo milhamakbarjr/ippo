@@ -43,6 +43,7 @@ export function DashboardPage() {
         const dbLevel = (session.user as { assessed_level?: string }).assessed_level as JLPTLevelId | undefined;
         if (dbLevel && LEVEL_ORDER.includes(dbLevel)) {
           setSelectedLevel(dbLevel);
+          setUserLevel(dbLevel);
         }
       }
     } catch { /* ignore */ }
