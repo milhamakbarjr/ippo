@@ -8,14 +8,14 @@ interface TipShowcaseCardProps {
 export function TipShowcaseCard({ card }: TipShowcaseCardProps) {
   return (
     <div className="flex items-center gap-4 rounded-xl bg-brand-solid px-5 py-4">
-      <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-white/15 px-4 py-3 min-w-[72px]">
+      <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-white/10 px-4 py-3 min-w-[72px]">
         <span className="text-4xl font-medium text-white leading-none">{card.char}</span>
-        <VolumeMax className="mt-1.5 size-4 text-white/70" aria-hidden="true" />
+        <VolumeMax className="mt-1.5 size-4 text-quaternary_on-brand" aria-hidden="true" />
       </div>
       <div className="flex flex-col gap-0.5">
         <span className="text-base font-semibold text-white">{card.romaji}</span>
         {card.englishComparison && (
-          <span className="text-sm text-white/80">{card.englishComparison}</span>
+          <span className="text-sm text-tertiary_on-brand">{card.englishComparison}</span>
         )}
       </div>
     </div>

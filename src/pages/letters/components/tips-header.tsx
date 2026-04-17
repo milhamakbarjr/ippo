@@ -37,7 +37,7 @@ export function TipsHeader({ type }: TipsHeaderProps) {
       <div className="flex items-center gap-4 rounded-xl bg-brand-solid px-5 py-4">
         <div className="flex flex-col gap-0.5">
           <p className="text-base font-bold text-white">{title}</p>
-          <p className="text-sm text-white/80">{subtitle}</p>
+          <p className="text-sm text-tertiary_on-brand">{subtitle}</p>
         </div>
       </div>
     </div>

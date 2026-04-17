@@ -42,6 +42,7 @@ export function LettersHeader({ type }: LettersHeaderProps) {
           color="primary"
           size="sm"
           className="w-full justify-center"
+          isDisabled
         >
           Pelajari Karakter
         </Button>
