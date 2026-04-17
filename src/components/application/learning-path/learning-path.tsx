@@ -29,8 +29,12 @@ export function LearningPath({
   const currentNodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    currentNodeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, []);
+    if (!currentNodeRef.current) return;
+    const id = requestAnimationFrame(() => {
+      currentNodeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [config.levelId]);
 
   const stepMap = useMemo(() => {
     const map: Record<string, Step> = {};

@@ -68,7 +68,8 @@ export function UnitLearningPage() {
 
   // Step data for resources + completion
   const levelData = LEVELS[level as JLPTLevelId];
-  const stepSlug = unit?.stepSlugs[0];
+  const allStepSlugs = unit?.stepSlugs ?? [];
+  const stepSlug = allStepSlugs[0];
   const step = stepSlug ? levelData?.steps.find((s) => s.slug === stepSlug) : undefined;
 
   const mutation = useCompleteStep(user?.id, level);
@@ -92,24 +93,27 @@ export function UnitLearningPage() {
 
   const unitContent = unit.content;
 
-  // Completion state
-  const isCompleted = stepSlug
+  // Completion state — unit is complete only when ALL its steps are marked done
+  const isCompleted = allStepSlugs.length > 0
     ? user
-      ? (progressData?.steps.find((s) => s.slug === stepSlug)?.completed ?? false)
-      : isStepComplete(stepSlug)
+      ? allStepSlugs.every((s) => progressData?.steps.find((p) => p.slug === s)?.completed ?? false)
+      : allStepSlugs.every(isStepComplete)
     : false;
 
   function handleComplete() {
-    if (isCompleted || !stepSlug) return;
+    if (isCompleted || allStepSlugs.length === 0) return;
 
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 800);
 
     if (user) {
       setShowXP(true);
-      mutation.mutate({ user_id: user.id, level, step_slug: stepSlug });
+      // Mark all step slugs in this unit as complete
+      allStepSlugs.forEach((slug) => {
+        mutation.mutate({ user_id: user.id, level, step_slug: slug });
+      });
     } else {
-      markStepComplete(stepSlug);
+      allStepSlugs.forEach(markStepComplete);
       toast.success('Selamat! Progres disimpan di browser ini. Buat akun untuk sinkronisasi.', {
         duration: 6000,
         action: {
