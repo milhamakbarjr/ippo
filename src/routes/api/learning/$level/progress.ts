@@ -3,6 +3,22 @@ import { db } from "@/db";
 import { users, progress } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { auth } from "@/lib/auth";
+import type { Level } from "@/types/learning";
+import * as kanaContent from "../../../../content/kana/index";
+import * as n5Content from "../../../../content/n5/index";
+import * as n4Content from "../../../../content/n4/index";
+import * as n3Content from "../../../../content/n3/index";
+import * as n2Content from "../../../../content/n2/index";
+import * as n1Content from "../../../../content/n1/index";
+
+const LEVEL_CONTENT: Record<string, { level?: Level }> = {
+    kana: kanaContent,
+    n5: n5Content,
+    n4: n4Content,
+    n3: n3Content,
+    n2: n2Content,
+    n1: n1Content,
+};
 
 const VALID_LEVELS = ["kana", "n5", "n4", "n3", "n2", "n1"] as const;
 type ValidLevel = (typeof VALID_LEVELS)[number];
@@ -80,29 +96,19 @@ export const Route = createFileRoute("/api/learning/$level/progress")({
                         .map((r) => r.step_slug),
                 );
 
-                // Try to load level content for step titles + ordering.
-                // Content files are created by another agent — use try/catch.
+                // Load level content for step titles + ordering.
                 let levelSteps: Array<{ slug: string; title: string }> = [];
-                try {
-                    // @ts-ignore — dynamic import path; content files may not exist yet
-                    const contentModule = await import(
-                        `../../../../content/${level}/index`
-                    );
-                    const levelConfig =
-                        contentModule.default ?? contentModule.level;
-                    if (levelConfig?.steps) {
-                        levelSteps = levelConfig.steps.map(
-                            (s: { slug: string; title: string }) => ({
-                                slug: s.slug,
-                                title: s.title,
-                            }),
-                        );
-                    }
-                } catch {
-                    // Content file not available — derive step list from DB rows
+                const contentModule = LEVEL_CONTENT[level];
+                if (contentModule?.level?.steps) {
+                    levelSteps = contentModule.level.steps.map((s) => ({
+                        slug: s.slug,
+                        title: s.title,
+                    }));
+                } else {
+                    // Derive step list from DB rows as fallback
                     levelSteps = progressRows.map((r) => ({
                         slug: r.step_slug,
-                        title: r.step_slug, // Fallback: use slug as title
+                        title: r.step_slug,
                     }));
                 }
 
