@@ -18,10 +18,10 @@ interface TopbarIppoProps {
   activeUrl?: string;
   items: NavItemType[];
   footerItems?: NavItemType[];
-  showAccountCard?: boolean;
+  isAuthenticated?: boolean;
 }
 
-export function TopbarIppo({ activeUrl, items, footerItems = [], showAccountCard = true }: TopbarIppoProps) {
+export function TopbarIppo({ activeUrl, items, footerItems = [], isAuthenticated = false }: TopbarIppoProps) {
   return (
     <>
       {/* ── Mobile header (< lg) ── */}
@@ -84,7 +84,7 @@ export function TopbarIppo({ activeUrl, items, footerItems = [], showAccountCard
                           ))}
                         </ul>
                       )}
-                      {showAccountCard && <IppoAccountMenu variant="card" />}
+                      {isAuthenticated && <IppoAccountMenu variant="card" />}
                     </div>
                   </aside>
                 </AriaDialog>
@@ -126,7 +126,7 @@ export function TopbarIppo({ activeUrl, items, footerItems = [], showAccountCard
 
           {/* Right side actions */}
           <div className="ml-auto flex items-center gap-3">
-            {showAccountCard && <IppoAccountMenu variant="avatar" />}
+            {isAuthenticated && <IppoAccountMenu variant="avatar" />}
           </div>
         </div>
       </header>

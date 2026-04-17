@@ -7,9 +7,14 @@ export function GuestSignupCard() {
       <p className="text-tertiary text-xs mb-3">
         Daftar gratis untuk menyinkronkan progres belajarmu di semua perangkat.
       </p>
-      <Button color="primary" size="sm" href="/auth/register" className="w-full">
-        Daftar Sekarang
-      </Button>
+      <div className="flex flex-col gap-2">
+        <Button color="primary" size="sm" href="/auth/register" className="w-full">
+          Daftar Sekarang
+        </Button>
+        <Button color="secondary" size="sm" href="/auth/login" className="w-full">
+          Login
+        </Button>
+      </div>
     </div>
   );
 }
