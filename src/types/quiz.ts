@@ -8,13 +8,13 @@ export type QuizQuestion = {
   }>;
   explanation: string;        // Indonesian explanation shown after answer
   category: 'vocab' | 'kanji' | 'grammar' | 'reading';
-  level: 'n5' | 'n4' | 'n3' | 'n2' | 'n1';
+  level: 'kana' | 'n5' | 'n4' | 'n3' | 'n2' | 'n1';
 };
 
 export type QuizContent = {
   slug: string;
   title: string;
-  level: 'n5' | 'n4' | 'n3' | 'n2' | 'n1';
+  level: 'kana' | 'n5' | 'n4' | 'n3' | 'n2' | 'n1';
   category: 'vocab' | 'kanji' | 'grammar' | 'reading';
   questions: QuizQuestion[];
 };

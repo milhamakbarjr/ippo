@@ -36,6 +36,8 @@ import { Route as LettersTipsTypeIndexRouteImport } from './routes/letters/tips.
 import { Route as LettersTipsTypeTipSlugRouteImport } from './routes/letters/tips.$type.$tipSlug'
 import { Route as ApiQuizSlugHistoryRouteImport } from './routes/api/quiz/$slug/history'
 import { Route as ApiLearningLevelProgressRouteImport } from './routes/api/learning/$level/progress'
+import { Route as LearningLevelUnitSectionSlugUnitSlugRouteImport } from './routes/learning/$level.unit.$sectionSlug.$unitSlug'
+import { Route as LearningLevelGuidebookSectionSlugUnitSlugRouteImport } from './routes/learning/$level.guidebook.$sectionSlug.$unitSlug'
 
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
@@ -173,6 +175,18 @@ const ApiLearningLevelProgressRoute =
     path: '/api/learning/$level/progress',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LearningLevelUnitSectionSlugUnitSlugRoute =
+  LearningLevelUnitSectionSlugUnitSlugRouteImport.update({
+    id: '/unit/$sectionSlug/$unitSlug',
+    path: '/unit/$sectionSlug/$unitSlug',
+    getParentRoute: () => LearningLevelRoute,
+  } as any)
+const LearningLevelGuidebookSectionSlugUnitSlugRoute =
+  LearningLevelGuidebookSectionSlugUnitSlugRouteImport.update({
+    id: '/guidebook/$sectionSlug/$unitSlug',
+    path: '/guidebook/$sectionSlug/$unitSlug',
+    getParentRoute: () => LearningLevelRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -202,6 +216,8 @@ export interface FileRoutesByFullPath {
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
   '/letters/tips/$type/$tipSlug': typeof LettersTipsTypeTipSlugRoute
   '/letters/tips/$type/': typeof LettersTipsTypeIndexRoute
+  '/learning/$level/guidebook/$sectionSlug/$unitSlug': typeof LearningLevelGuidebookSectionSlugUnitSlugRoute
+  '/learning/$level/unit/$sectionSlug/$unitSlug': typeof LearningLevelUnitSectionSlugUnitSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -228,6 +244,8 @@ export interface FileRoutesByTo {
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
   '/letters/tips/$type/$tipSlug': typeof LettersTipsTypeTipSlugRoute
   '/letters/tips/$type': typeof LettersTipsTypeIndexRoute
+  '/learning/$level/guidebook/$sectionSlug/$unitSlug': typeof LearningLevelGuidebookSectionSlugUnitSlugRoute
+  '/learning/$level/unit/$sectionSlug/$unitSlug': typeof LearningLevelUnitSectionSlugUnitSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -258,6 +276,8 @@ export interface FileRoutesById {
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
   '/letters/tips/$type/$tipSlug': typeof LettersTipsTypeTipSlugRoute
   '/letters/tips/$type/': typeof LettersTipsTypeIndexRoute
+  '/learning/$level/guidebook/$sectionSlug/$unitSlug': typeof LearningLevelGuidebookSectionSlugUnitSlugRoute
+  '/learning/$level/unit/$sectionSlug/$unitSlug': typeof LearningLevelUnitSectionSlugUnitSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -289,6 +309,8 @@ export interface FileRouteTypes {
     | '/api/quiz/$slug/history'
     | '/letters/tips/$type/$tipSlug'
     | '/letters/tips/$type/'
+    | '/learning/$level/guidebook/$sectionSlug/$unitSlug'
+    | '/learning/$level/unit/$sectionSlug/$unitSlug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -315,6 +337,8 @@ export interface FileRouteTypes {
     | '/api/quiz/$slug/history'
     | '/letters/tips/$type/$tipSlug'
     | '/letters/tips/$type'
+    | '/learning/$level/guidebook/$sectionSlug/$unitSlug'
+    | '/learning/$level/unit/$sectionSlug/$unitSlug'
   id:
     | '__root__'
     | '/'
@@ -344,6 +368,8 @@ export interface FileRouteTypes {
     | '/api/quiz/$slug/history'
     | '/letters/tips/$type/$tipSlug'
     | '/letters/tips/$type/'
+    | '/learning/$level/guidebook/$sectionSlug/$unitSlug'
+    | '/learning/$level/unit/$sectionSlug/$unitSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -561,6 +587,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLearningLevelProgressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learning/$level/unit/$sectionSlug/$unitSlug': {
+      id: '/learning/$level/unit/$sectionSlug/$unitSlug'
+      path: '/unit/$sectionSlug/$unitSlug'
+      fullPath: '/learning/$level/unit/$sectionSlug/$unitSlug'
+      preLoaderRoute: typeof LearningLevelUnitSectionSlugUnitSlugRouteImport
+      parentRoute: typeof LearningLevelRoute
+    }
+    '/learning/$level/guidebook/$sectionSlug/$unitSlug': {
+      id: '/learning/$level/guidebook/$sectionSlug/$unitSlug'
+      path: '/guidebook/$sectionSlug/$unitSlug'
+      fullPath: '/learning/$level/guidebook/$sectionSlug/$unitSlug'
+      preLoaderRoute: typeof LearningLevelGuidebookSectionSlugUnitSlugRouteImport
+      parentRoute: typeof LearningLevelRoute
+    }
   }
 }
 
@@ -594,11 +634,17 @@ const LettersRouteWithChildren =
 interface LearningLevelRouteChildren {
   LearningLevelStepSlugRoute: typeof LearningLevelStepSlugRoute
   LearningLevelIndexRoute: typeof LearningLevelIndexRoute
+  LearningLevelGuidebookSectionSlugUnitSlugRoute: typeof LearningLevelGuidebookSectionSlugUnitSlugRoute
+  LearningLevelUnitSectionSlugUnitSlugRoute: typeof LearningLevelUnitSectionSlugUnitSlugRoute
 }
 
 const LearningLevelRouteChildren: LearningLevelRouteChildren = {
   LearningLevelStepSlugRoute: LearningLevelStepSlugRoute,
   LearningLevelIndexRoute: LearningLevelIndexRoute,
+  LearningLevelGuidebookSectionSlugUnitSlugRoute:
+    LearningLevelGuidebookSectionSlugUnitSlugRoute,
+  LearningLevelUnitSectionSlugUnitSlugRoute:
+    LearningLevelUnitSectionSlugUnitSlugRoute,
 }
 
 const LearningLevelRouteWithChildren = LearningLevelRoute._addFileChildren(
