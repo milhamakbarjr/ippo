@@ -47,7 +47,7 @@ export function CharacterCard({ entry, variant = 'sm', isKanji = false }: Charac
             {({ close }) => (
               <div className="w-full rounded-2xl border border-secondary bg-primary shadow-xl">
                 {/* Header */}
-                <div className="flex items-start justify-between border-b border-secondary px-6 py-4">
+                <div className="flex items-start justify-between border-b border-secondary px-4 py-4 sm:px-6">
                   <div className="flex items-center gap-4">
                     <span className="text-5xl font-medium text-primary leading-none">{entry.char}</span>
                     <div className="flex flex-col gap-1">
@@ -80,16 +80,16 @@ export function CharacterCard({ entry, variant = 'sm', isKanji = false }: Charac
 
                 {/* Examples */}
                 {entry.examples && entry.examples.length > 0 && (
-                  <div className="px-6 py-4">
+                  <div className="px-4 py-4 sm:px-6">
                     <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-tertiary">Contoh Kata</p>
                     <ul className="flex flex-col gap-2">
                       {entry.examples.map((ex) => (
                         <li key={ex.word} className="flex items-center justify-between gap-3 rounded-lg bg-secondary px-3 py-2.5">
-                          <div className="min-w-0">
+                          <div className="min-w-0 truncate">
                             <span className="text-base font-medium text-primary">{ex.word}</span>
                             <span className="ml-2 text-sm text-tertiary">({ex.reading})</span>
                           </div>
-                          <span className="shrink-0 text-sm text-secondary">{ex.meaning}</span>
+                          <span className="shrink-0 max-w-[40%] truncate text-sm text-secondary">{ex.meaning}</span>
                         </li>
                       ))}
                     </ul>
