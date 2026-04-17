@@ -26,7 +26,7 @@ export function SectionHeader({ section, unitNumber, currentUnit, levelId }: Sec
     <div className={`sticky top-14 z-20 px-4 py-3 mb-4 rounded-xl ${theme.bg}`}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-fg-white/70 font-medium">
+          <p className="text-xs text-fg-white opacity-70 font-medium">
             SEKSI {section.sectionNumber}, UNIT {unitNumber}
           </p>
           <p className="text-fg-white font-bold text-base">{currentUnit.title}</p>

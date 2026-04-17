@@ -69,12 +69,14 @@ export function LearningPath({
 
         return (
           <div key={section.slug} className="w-full">
-            <SectionHeader
-              section={section}
-              unitNumber={activeUnitIndex + 1}
-              currentUnit={activeUnit}
-              levelId={config.levelId}
-            />
+            {activeUnit && (
+              <SectionHeader
+                section={section}
+                unitNumber={activeUnitIndex + 1}
+                currentUnit={activeUnit}
+                levelId={config.levelId}
+              />
+            )}
 
             {sectionIndex === 0 && (
               <div className="w-full mb-6">{youAreHereCard}</div>

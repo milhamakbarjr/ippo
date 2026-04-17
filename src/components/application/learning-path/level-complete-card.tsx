@@ -1,15 +1,5 @@
 import { Button } from '@/components/base/buttons/button';
-
-const LEVEL_ORDER = ['kana', 'n5', 'n4', 'n3', 'n2', 'n1'];
-
-const LEVEL_LABELS: Record<string, string> = {
-  kana: 'KANA',
-  n5: 'N5',
-  n4: 'N4',
-  n3: 'N3',
-  n2: 'N2',
-  n1: 'N1',
-};
+import { LEVEL_LABELS } from '@/content/levels';
 
 interface LevelCompleteCardProps {
   currentLevelId: string;
@@ -21,8 +11,6 @@ export function LevelCompleteCard({ currentLevelId, nextLevelId }: LevelComplete
 
   const currentLabel = LEVEL_LABELS[currentLevelId] ?? currentLevelId.toUpperCase();
   const nextLabel = LEVEL_LABELS[nextLevelId] ?? nextLevelId.toUpperCase();
-
-  void LEVEL_ORDER;
 
   return (
     <div className="rounded-xl border border-secondary bg-success-primary/10 p-4">

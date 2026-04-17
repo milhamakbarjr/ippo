@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'motion/react';
 import { ArrowLeft } from '@untitledui/icons';
 import { authClient } from '@/lib/auth-client';
@@ -16,8 +15,9 @@ import { LEVELS } from '@/content/levels';
 import { UNIT_CHARACTER_SECTIONS } from '@/content/kana/unit-content';
 import { Route } from '@/routes/learning/$level.unit.$sectionSlug.$unitSlug';
 import { useCompleteStep } from '@/hooks/use-complete-step';
+import { useLevelProgress } from '@/hooks/use-level-progress';
 import { isStepComplete, markStepComplete } from '@/utils/guest-progress';
-import type { JLPTLevelId, LevelProgressResult, StepResource } from '@/types/learning';
+import type { JLPTLevelId, StepResource } from '@/types/learning';
 
 function getYouTubeVideoId(url: string): string | null {
   try {
@@ -54,9 +54,9 @@ function YouTubeEmbed({ resource }: { resource: StepResource }) {
 export function UnitLearningPage() {
   const { level, sectionSlug, unitSlug } = Route.useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { data: session } = authClient.useSession();
   const user = session?.user;
+  const { data: progressData } = useLevelProgress(level, user?.id);
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [showXP, setShowXP] = useState(false);
@@ -93,10 +93,9 @@ export function UnitLearningPage() {
   const unitContent = unit.content;
 
   // Completion state
-  const cachedProgress = queryClient.getQueryData<LevelProgressResult>(['progress', user?.id, level]);
   const isCompleted = stepSlug
     ? user
-      ? (cachedProgress?.steps.find((s) => s.slug === stepSlug)?.completed ?? false)
+      ? (progressData?.steps.find((s) => s.slug === stepSlug)?.completed ?? false)
       : isStepComplete(stepSlug)
     : false;
 
