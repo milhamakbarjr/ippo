@@ -1,5 +1,6 @@
 import { Button } from '@/components/base/buttons/button';
 import { LEVEL_LABELS } from '@/content/levels';
+import type { JLPTLevelId } from '@/types/learning';
 
 interface LevelCompleteCardProps {
   currentLevelId: string;
@@ -9,8 +10,8 @@ interface LevelCompleteCardProps {
 export function LevelCompleteCard({ currentLevelId, nextLevelId }: LevelCompleteCardProps) {
   if (!nextLevelId) return null;
 
-  const currentLabel = LEVEL_LABELS[currentLevelId] ?? currentLevelId.toUpperCase();
-  const nextLabel = LEVEL_LABELS[nextLevelId] ?? nextLevelId.toUpperCase();
+  const currentLabel = LEVEL_LABELS[currentLevelId as JLPTLevelId] ?? currentLevelId.toUpperCase();
+  const nextLabel = LEVEL_LABELS[nextLevelId as JLPTLevelId] ?? nextLevelId.toUpperCase();
 
   return (
     <div className="rounded-xl border border-secondary bg-success-primary/10 p-4">
