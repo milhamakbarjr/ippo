@@ -1,4 +1,5 @@
-import { AriaRadio, RadioButtonBase } from '@/components/base/radio-buttons/radio-buttons';
+import { Radio as AriaRadio } from 'react-aria-components';
+import { RadioButtonBase } from '@/components/base/radio-buttons/radio-buttons';
 import { cx } from '@/utils/cx';
 
 interface OptionCardProps {
