@@ -236,3 +236,5 @@ export const level: Level = {
 };
 
 export default level;
+
+export { kanaSections } from './sections';

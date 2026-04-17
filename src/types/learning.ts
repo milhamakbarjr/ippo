@@ -46,3 +46,66 @@ export type LevelProgressResult = {
   steps: Array<{ slug: string; title: string; completed: boolean }>;
   recommendedNextStep?: string;
 };
+
+// --- Learning path layout types ---
+
+export type GuidebookPhrase = {
+  japanese: string;
+  romaji: string;
+  indonesian: string;
+};
+
+export type GuidebookTip = {
+  title: string;
+  body: string;
+};
+
+/** Section-level guide (shown when clicking PANDUAN) */
+export type SectionGuide = {
+  title: string;
+  description: string;
+  objectives: string[];
+  strategies: GuidebookTip[];
+  commonMistakes: GuidebookTip[];
+};
+
+/** Pronunciation comparison card for a single character */
+export type PronunciationCard = {
+  char: string;
+  romaji: string;
+  comparison: string; // Indonesian pronunciation comparison
+};
+
+/** Rich learning content for a unit (shown when clicking a path node) */
+export type UnitContent = {
+  pronunciationCards: PronunciationCard[];
+  mnemonics: GuidebookTip[];
+  practicePrompts: string[];
+};
+
+export type Unit = {
+  slug: string;
+  title: string;
+  titleEn?: string;
+  stepSlugs: string[];
+  /** Quick reference phrases shown on the unit learning page */
+  phrases: GuidebookPhrase[];
+  /** Rich learning content (character grids, pronunciation, mnemonics) */
+  content: UnitContent;
+};
+
+export type Section = {
+  slug: string;
+  title: string;
+  titleEn?: string;
+  sectionNumber: number;
+  units: Unit[];
+  quizSlug?: string;
+  /** Section-level guide (how to excel this whole section) */
+  guide: SectionGuide;
+};
+
+export type LevelPathConfig = {
+  levelId: JLPTLevelId;
+  sections: Section[];
+};

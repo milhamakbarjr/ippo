@@ -8,6 +8,7 @@ import { StreakCard } from './components/streak-card';
 import { XpProgressCard } from './components/xp-progress-card';
 import { AchievementsSummaryCard } from './components/achievements-summary-card';
 import { GuestSignupCard } from './components/guest-signup-card';
+import { AssessmentResultCard } from './components/assessment-result-card';
 import { LevelStepsBlock } from './components/level-steps-block';
 import { LEVEL_ORDER, LEVEL_LABELS } from '@/content/levels';
 import type { JLPTLevelId } from '@/types/learning';
@@ -75,6 +76,11 @@ export function DashboardPage() {
           <StatPills isAuthenticated={isAuthenticated} />
         </div>
 
+        {/* Mobile assessment result */}
+        <div className="mb-4 lg:hidden">
+          <AssessmentResultCard />
+        </div>
+
         {/* Mobile guest signup */}
         {!isAuthenticated && (
           <div className="mb-4 lg:hidden">
@@ -116,6 +122,7 @@ export function DashboardPage() {
           {/* Right column: stats + cards (desktop only) */}
           <aside className="hidden lg:flex lg:flex-col lg:gap-3">
             <StatPills isAuthenticated={isAuthenticated} />
+            <AssessmentResultCard />
             <StreakCard streak={streak} />
             {isAuthenticated && achievementsData && (
               <>

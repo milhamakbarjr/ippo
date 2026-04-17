@@ -1,11 +1,13 @@
 import { motion } from 'motion/react';
 import { StepItem } from '@/components/application/learning-path/step-item';
+import { LearningPath } from '@/components/application/learning-path/learning-path';
 import { YouAreHereCard } from '@/components/application/learning-path/you-are-here-card';
 import { NoAssessmentBanner } from '@/components/application/learning-path/no-assessment-banner';
 import { LevelCompleteCard } from '@/components/application/learning-path/level-complete-card';
 import { useLevelProgress } from '@/hooks/use-level-progress';
 import { getLevelProgress } from '@/utils/guest-progress';
 import { LEVELS, LEVEL_ORDER } from '@/content/levels';
+import { LEVEL_PATH_CONFIGS } from '@/content/sections';
 import type { JLPTLevelId } from '@/types/learning';
 
 interface LevelStepsBlockProps {
@@ -50,23 +52,42 @@ export function LevelStepsBlock({
       ? LEVEL_ORDER[currentLevelIndex + 1]
       : undefined;
 
+  const youAreHereCard = userLevel ? (
+    <YouAreHereCard
+      level={levelConfig}
+      completedCount={completedCount}
+      totalCount={totalCount}
+      progressPercent={progressPercent}
+      streak={streak}
+    />
+  ) : (
+    <NoAssessmentBanner />
+  );
+
+  const levelCompleteCard = allComplete ? (
+    <LevelCompleteCard currentLevelId={levelConfig.id} nextLevelId={nextLevelId} />
+  ) : undefined;
+
+  // Use Duolingo-style path layout if section config exists for this level
+  const pathConfig = LEVEL_PATH_CONFIGS[levelId];
+  if (pathConfig) {
+    return (
+      <LearningPath
+        config={pathConfig}
+        steps={levelConfig.steps}
+        completedSlugs={completedSlugs}
+        recommendedNextSlug={recommendedNextSlug}
+        youAreHereCard={youAreHereCard}
+        levelCompleteCard={levelCompleteCard}
+      />
+    );
+  }
+
+  // Fallback: flat list for levels without a path config (N5-N1)
   return (
     <div className="space-y-3">
-      {userLevel ? (
-        <YouAreHereCard
-          level={levelConfig}
-          completedCount={completedCount}
-          totalCount={totalCount}
-          progressPercent={progressPercent}
-          streak={streak}
-        />
-      ) : (
-        <NoAssessmentBanner />
-      )}
-
-      {allComplete && (
-        <LevelCompleteCard currentLevelId={levelConfig.id} nextLevelId={nextLevelId} />
-      )}
+      {youAreHereCard}
+      {allComplete && levelCompleteCard}
 
       <motion.div
         variants={{

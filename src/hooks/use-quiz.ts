@@ -4,6 +4,7 @@ import type { QuizContent } from '@/types/quiz';
 
 // Dynamic imports for quiz content (code-split per slug)
 const QUIZ_LOADERS: Record<string, () => Promise<{ default: QuizContent }>> = {
+  'kana-mastery': () => import('@/content/quizzes/kana-mastery'),
   'n5-vocab':   () => import('@/content/quizzes/n5-vocab'),
   'n5-grammar': () => import('@/content/quizzes/n5-grammar'),
   'n5-kanji':   () => import('@/content/quizzes/n5-kanji'),
