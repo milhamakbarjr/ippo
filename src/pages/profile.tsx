@@ -21,7 +21,7 @@ export function ProfilePage() {
 
   if (sessionPending) {
     return (
-      <div className="min-h-dvh bg-primary pb-[env(safe-area-inset-bottom)]">
+      <div className="pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-2xl mx-auto px-4 pt-6">
           <div className="h-8 w-48 rounded-lg bg-secondary animate-pulse mb-4" />
           <div className="h-4 w-32 rounded-lg bg-secondary animate-pulse mb-8" />
@@ -40,7 +40,7 @@ export function ProfilePage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-dvh bg-primary pb-[env(safe-area-inset-bottom)]">
+      <div className="pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-2xl mx-auto px-4 pt-6 flex flex-col items-center justify-center gap-4 text-center py-20">
           <p className="text-primary text-xl font-semibold">Lihat koleksimu</p>
           <p className="text-tertiary text-sm">
@@ -71,7 +71,7 @@ export function ProfilePage() {
   );
 
   return (
-    <div className="min-h-dvh bg-primary pb-[env(safe-area-inset-bottom)]">
+    <div className="pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-2xl mx-auto px-4 pt-6">
         {/* Header */}
         <div className="mb-6">

@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { X as CloseIcon, Menu02 } from '@untitledui/icons';
 import {
   Button as AriaButton,
@@ -6,19 +5,14 @@ import {
   DialogTrigger as AriaDialogTrigger,
   Modal as AriaModal,
   ModalOverlay as AriaModalOverlay,
-  Popover as AriaPopover,
 } from 'react-aria-components';
-import { Avatar } from '@/components/base/avatar/avatar';
 import { IppoLogo } from '@/components/foundations/logo/ippo-logo';
-import { NavAccountCard, NavAccountMenu } from '@/components/application/app-navigation/base-components/nav-account-card';
 import { NavButton } from '@/components/application/app-navigation/base-components/nav-button';
 import { NavItemBase } from '@/components/application/app-navigation/base-components/nav-item';
 import { NavList } from '@/components/application/app-navigation/base-components/nav-list';
-import { ThemeSelector } from '@/components/shared/theme-selector';
+import { IppoAccountMenu } from '@/components/shared/ippo-account-menu';
 import { cx } from '@/utils/cx';
 import type { NavItemType } from '@/components/application/app-navigation/config';
-
-const PLACEHOLDER_AVATAR = 'https://www.untitledui.com/images/avatars/caitlyn-king?fm=webp&q=80';
 
 interface TopbarIppoProps {
   activeUrl?: string;
@@ -28,8 +22,6 @@ interface TopbarIppoProps {
 }
 
 export function TopbarIppo({ activeUrl, items, footerItems = [], showAccountCard = true }: TopbarIppoProps) {
-  const avatarTriggerRef = useRef<HTMLButtonElement>(null);
-
   return (
     <>
       {/* ── Mobile header (< lg) ── */}
@@ -92,8 +84,7 @@ export function TopbarIppo({ activeUrl, items, footerItems = [], showAccountCard
                           ))}
                         </ul>
                       )}
-                      <ThemeSelector />
-                      {showAccountCard && <NavAccountCard />}
+                      {showAccountCard && <IppoAccountMenu variant="card" />}
                     </div>
                   </aside>
                 </AriaDialog>
@@ -135,34 +126,7 @@ export function TopbarIppo({ activeUrl, items, footerItems = [], showAccountCard
 
           {/* Right side actions */}
           <div className="ml-auto flex items-center gap-3">
-            <ThemeSelector />
-
-            {showAccountCard && (
-              <AriaDialogTrigger>
-                <AriaButton
-                  ref={avatarTriggerRef}
-                  aria-label="Open account menu"
-                  className="rounded-full outline-focus-ring focus-visible:outline-2 focus-visible:outline-offset-2"
-                >
-                  <Avatar size="sm" src={PLACEHOLDER_AVATAR} alt="Account" status="online" />
-                </AriaButton>
-
-                <AriaPopover
-                  triggerRef={avatarTriggerRef}
-                  placement="bottom end"
-                  offset={8}
-                  className={({ isEntering, isExiting }) =>
-                    cx(
-                      'origin-(--trigger-anchor-point) will-change-transform',
-                      isEntering && 'duration-150 ease-out animate-in fade-in slide-in-from-top-1',
-                      isExiting && 'duration-100 ease-in animate-out fade-out slide-out-to-top-1',
-                    )
-                  }
-                >
-                  <NavAccountMenu />
-                </AriaPopover>
-              </AriaDialogTrigger>
-            )}
+            {showAccountCard && <IppoAccountMenu variant="avatar" />}
           </div>
         </div>
       </header>
