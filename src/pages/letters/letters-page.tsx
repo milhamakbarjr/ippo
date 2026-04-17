@@ -47,7 +47,7 @@ export function LettersPage() {
             ) : (
               <div className="flex flex-col gap-8">
                 {SECTIONS_BY_TYPE[tab.id].map((section) => (
-                  <CharacterGrid key={section.title} section={section} />
+                  <CharacterGrid key={section.title} section={section} isKanji={tab.id === 'kanji'} />
                 ))}
               </div>
             )}

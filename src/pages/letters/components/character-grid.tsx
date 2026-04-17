@@ -3,9 +3,10 @@ import { CharacterCard } from './character-card';
 
 interface CharacterGridProps {
   section: CharacterSection;
+  isKanji?: boolean;
 }
 
-export function CharacterGrid({ section }: CharacterGridProps) {
+export function CharacterGrid({ section, isKanji = false }: CharacterGridProps) {
   const gridColsClass: Record<number, string> = {
     3: 'grid-cols-3',
     4: 'grid-cols-4',
@@ -27,7 +28,7 @@ export function CharacterGrid({ section }: CharacterGridProps) {
           entry === null ? (
             <div key={idx} aria-hidden="true" />
           ) : (
-            <CharacterCard key={`${entry.char}-${idx}`} entry={entry} />
+            <CharacterCard key={`${entry.char}-${idx}`} entry={entry} isKanji={isKanji} />
           ),
         )}
       </div>

@@ -1,6 +1,12 @@
 export interface CharacterEntry {
   char: string;
   romaji: string;
+  /** Indonesian meaning — used for kanji display */
+  meaning?: string;
+  /** On'yomi (Chinese reading) in katakana — kanji only */
+  onyomi?: string;
+  /** Kun'yomi (Japanese reading) in hiragana — kanji only */
+  kunyomi?: string;
   examples?: { word: string; reading: string; meaning: string }[];
 }
 
