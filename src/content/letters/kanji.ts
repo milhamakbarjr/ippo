@@ -1,4 +1,5 @@
 import type { CharacterSection } from '@/types/letters';
+import { KANJI_N4_SECTIONS } from './kanji-n4';
 
 // JLPT N5 Kanji — 103 kanji organized by thematic category
 // Readings: romaji = primary displayed reading, onyomi = on'yomi (katakana), kunyomi = kun'yomi (hiragana)
@@ -188,4 +189,5 @@ export const KANJI_SECTIONS: CharacterSection[] = [
   N5_SIZE,
   N5_VERBS,
   N5_MISC,
+  ...KANJI_N4_SECTIONS,
 ];
