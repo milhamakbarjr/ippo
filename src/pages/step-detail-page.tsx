@@ -10,7 +10,7 @@ import { StepResourceLink } from '@/components/application/learning-path/step-re
 import { ConfettiBurst } from '@/components/application/learning-path/confetti-burst';
 import { Button } from '@/components/base/buttons/button';
 import { QuizPrompt } from '@/components/application/quiz-prompt';
-import { Route } from '@/routes/_app/learning/$level.$stepSlug';
+import { Route } from '@/routes/learning/$level.$stepSlug';
 import { useCompleteStep } from '@/hooks/use-complete-step';
 import { isStepComplete, markStepComplete } from '@/utils/guest-progress';
 import type { StepResource } from '@/types/learning';
