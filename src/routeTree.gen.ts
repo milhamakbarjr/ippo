@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as LettersRouteImport } from './routes/letters'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LettersIndexRouteImport } from './routes/letters/index'
 import { Route as LearningIndexRouteImport } from './routes/learning/index'
 import { Route as QuizzesSlugRouteImport } from './routes/quizzes/$slug'
 import { Route as LearningLevelRouteImport } from './routes/learning/$level'
@@ -20,6 +22,7 @@ import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as ApiAchievementsRouteImport } from './routes/api/achievements'
 import { Route as LearningLevelIndexRouteImport } from './routes/learning/$level.index'
+import { Route as LettersTipsTypeRouteImport } from './routes/letters/tips.$type'
 import { Route as LearningLevelStepSlugRouteImport } from './routes/learning/$level.$stepSlug'
 import { Route as ApiQuizSubmitRouteImport } from './routes/api/quiz/submit'
 import { Route as ApiProgressCompleteRouteImport } from './routes/api/progress/complete'
@@ -29,6 +32,8 @@ import { Route as ApiAuthSessionRouteImport } from './routes/api/auth/session'
 import { Route as ApiAuthSendOtpRouteImport } from './routes/api/auth/send-otp'
 import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
 import { Route as ApiAssessmentSubmitRouteImport } from './routes/api/assessment/submit'
+import { Route as LettersTipsTypeIndexRouteImport } from './routes/letters/tips.$type.index'
+import { Route as LettersTipsTypeTipSlugRouteImport } from './routes/letters/tips.$type.$tipSlug'
 import { Route as ApiQuizSlugHistoryRouteImport } from './routes/api/quiz/$slug/history'
 import { Route as ApiLearningLevelProgressRouteImport } from './routes/api/learning/$level/progress'
 
@@ -42,10 +47,20 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LettersRoute = LettersRouteImport.update({
+  id: '/letters',
+  path: '/letters',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LettersIndexRoute = LettersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LettersRoute,
 } as any)
 const LearningIndexRoute = LearningIndexRouteImport.update({
   id: '/learning/',
@@ -86,6 +101,11 @@ const LearningLevelIndexRoute = LearningLevelIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => LearningLevelRoute,
+} as any)
+const LettersTipsTypeRoute = LettersTipsTypeRouteImport.update({
+  id: '/tips/$type',
+  path: '/tips/$type',
+  getParentRoute: () => LettersRoute,
 } as any)
 const LearningLevelStepSlugRoute = LearningLevelStepSlugRouteImport.update({
   id: '/$stepSlug',
@@ -132,6 +152,16 @@ const ApiAssessmentSubmitRoute = ApiAssessmentSubmitRouteImport.update({
   path: '/api/assessment/submit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LettersTipsTypeIndexRoute = LettersTipsTypeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LettersTipsTypeRoute,
+} as any)
+const LettersTipsTypeTipSlugRoute = LettersTipsTypeTipSlugRouteImport.update({
+  id: '/$tipSlug',
+  path: '/$tipSlug',
+  getParentRoute: () => LettersTipsTypeRoute,
+} as any)
 const ApiQuizSlugHistoryRoute = ApiQuizSlugHistoryRouteImport.update({
   id: '/api/quiz/$slug/history',
   path: '/api/quiz/$slug/history',
@@ -146,6 +176,7 @@ const ApiLearningLevelProgressRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/letters': typeof LettersRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/api/achievements': typeof ApiAchievementsRoute
@@ -155,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/learning/$level': typeof LearningLevelRouteWithChildren
   '/quizzes/$slug': typeof QuizzesSlugRoute
   '/learning/': typeof LearningIndexRoute
+  '/letters/': typeof LettersIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/send-otp': typeof ApiAuthSendOtpRoute
@@ -164,9 +196,12 @@ export interface FileRoutesByFullPath {
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
+  '/letters/tips/$type': typeof LettersTipsTypeRouteWithChildren
   '/learning/$level/': typeof LearningLevelIndexRoute
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
+  '/letters/tips/$type/$tipSlug': typeof LettersTipsTypeTipSlugRoute
+  '/letters/tips/$type/': typeof LettersTipsTypeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -178,6 +213,7 @@ export interface FileRoutesByTo {
   '/auth/verify-otp': typeof AuthVerifyOtpRoute
   '/quizzes/$slug': typeof QuizzesSlugRoute
   '/learning': typeof LearningIndexRoute
+  '/letters': typeof LettersIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/send-otp': typeof ApiAuthSendOtpRoute
@@ -190,10 +226,13 @@ export interface FileRoutesByTo {
   '/learning/$level': typeof LearningLevelIndexRoute
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
+  '/letters/tips/$type/$tipSlug': typeof LettersTipsTypeTipSlugRoute
+  '/letters/tips/$type': typeof LettersTipsTypeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/letters': typeof LettersRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/api/achievements': typeof ApiAchievementsRoute
@@ -203,6 +242,7 @@ export interface FileRoutesById {
   '/learning/$level': typeof LearningLevelRouteWithChildren
   '/quizzes/$slug': typeof QuizzesSlugRoute
   '/learning/': typeof LearningIndexRoute
+  '/letters/': typeof LettersIndexRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/send-otp': typeof ApiAuthSendOtpRoute
@@ -212,14 +252,18 @@ export interface FileRoutesById {
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
+  '/letters/tips/$type': typeof LettersTipsTypeRouteWithChildren
   '/learning/$level/': typeof LearningLevelIndexRoute
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
+  '/letters/tips/$type/$tipSlug': typeof LettersTipsTypeTipSlugRoute
+  '/letters/tips/$type/': typeof LettersTipsTypeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/letters'
     | '/onboarding'
     | '/profile'
     | '/api/achievements'
@@ -229,6 +273,7 @@ export interface FileRouteTypes {
     | '/learning/$level'
     | '/quizzes/$slug'
     | '/learning/'
+    | '/letters/'
     | '/api/assessment/submit'
     | '/api/auth/logout'
     | '/api/auth/send-otp'
@@ -238,9 +283,12 @@ export interface FileRouteTypes {
     | '/api/progress/complete'
     | '/api/quiz/submit'
     | '/learning/$level/$stepSlug'
+    | '/letters/tips/$type'
     | '/learning/$level/'
     | '/api/learning/$level/progress'
     | '/api/quiz/$slug/history'
+    | '/letters/tips/$type/$tipSlug'
+    | '/letters/tips/$type/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -252,6 +300,7 @@ export interface FileRouteTypes {
     | '/auth/verify-otp'
     | '/quizzes/$slug'
     | '/learning'
+    | '/letters'
     | '/api/assessment/submit'
     | '/api/auth/logout'
     | '/api/auth/send-otp'
@@ -264,9 +313,12 @@ export interface FileRouteTypes {
     | '/learning/$level'
     | '/api/learning/$level/progress'
     | '/api/quiz/$slug/history'
+    | '/letters/tips/$type/$tipSlug'
+    | '/letters/tips/$type'
   id:
     | '__root__'
     | '/'
+    | '/letters'
     | '/onboarding'
     | '/profile'
     | '/api/achievements'
@@ -276,6 +328,7 @@ export interface FileRouteTypes {
     | '/learning/$level'
     | '/quizzes/$slug'
     | '/learning/'
+    | '/letters/'
     | '/api/assessment/submit'
     | '/api/auth/logout'
     | '/api/auth/send-otp'
@@ -285,13 +338,17 @@ export interface FileRouteTypes {
     | '/api/progress/complete'
     | '/api/quiz/submit'
     | '/learning/$level/$stepSlug'
+    | '/letters/tips/$type'
     | '/learning/$level/'
     | '/api/learning/$level/progress'
     | '/api/quiz/$slug/history'
+    | '/letters/tips/$type/$tipSlug'
+    | '/letters/tips/$type/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LettersRoute: typeof LettersRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   ApiAchievementsRoute: typeof ApiAchievementsRoute
@@ -329,12 +386,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/letters': {
+      id: '/letters'
+      path: '/letters'
+      fullPath: '/letters'
+      preLoaderRoute: typeof LettersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/letters/': {
+      id: '/letters/'
+      path: '/'
+      fullPath: '/letters/'
+      preLoaderRoute: typeof LettersIndexRouteImport
+      parentRoute: typeof LettersRoute
     }
     '/learning/': {
       id: '/learning/'
@@ -391,6 +462,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/learning/$level/'
       preLoaderRoute: typeof LearningLevelIndexRouteImport
       parentRoute: typeof LearningLevelRoute
+    }
+    '/letters/tips/$type': {
+      id: '/letters/tips/$type'
+      path: '/tips/$type'
+      fullPath: '/letters/tips/$type'
+      preLoaderRoute: typeof LettersTipsTypeRouteImport
+      parentRoute: typeof LettersRoute
     }
     '/learning/$level/$stepSlug': {
       id: '/learning/$level/$stepSlug'
@@ -455,6 +533,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAssessmentSubmitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/letters/tips/$type/': {
+      id: '/letters/tips/$type/'
+      path: '/'
+      fullPath: '/letters/tips/$type/'
+      preLoaderRoute: typeof LettersTipsTypeIndexRouteImport
+      parentRoute: typeof LettersTipsTypeRoute
+    }
+    '/letters/tips/$type/$tipSlug': {
+      id: '/letters/tips/$type/$tipSlug'
+      path: '/$tipSlug'
+      fullPath: '/letters/tips/$type/$tipSlug'
+      preLoaderRoute: typeof LettersTipsTypeTipSlugRouteImport
+      parentRoute: typeof LettersTipsTypeRoute
+    }
     '/api/quiz/$slug/history': {
       id: '/api/quiz/$slug/history'
       path: '/api/quiz/$slug/history'
@@ -472,6 +564,33 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface LettersTipsTypeRouteChildren {
+  LettersTipsTypeTipSlugRoute: typeof LettersTipsTypeTipSlugRoute
+  LettersTipsTypeIndexRoute: typeof LettersTipsTypeIndexRoute
+}
+
+const LettersTipsTypeRouteChildren: LettersTipsTypeRouteChildren = {
+  LettersTipsTypeTipSlugRoute: LettersTipsTypeTipSlugRoute,
+  LettersTipsTypeIndexRoute: LettersTipsTypeIndexRoute,
+}
+
+const LettersTipsTypeRouteWithChildren = LettersTipsTypeRoute._addFileChildren(
+  LettersTipsTypeRouteChildren,
+)
+
+interface LettersRouteChildren {
+  LettersIndexRoute: typeof LettersIndexRoute
+  LettersTipsTypeRoute: typeof LettersTipsTypeRouteWithChildren
+}
+
+const LettersRouteChildren: LettersRouteChildren = {
+  LettersIndexRoute: LettersIndexRoute,
+  LettersTipsTypeRoute: LettersTipsTypeRouteWithChildren,
+}
+
+const LettersRouteWithChildren =
+  LettersRoute._addFileChildren(LettersRouteChildren)
+
 interface LearningLevelRouteChildren {
   LearningLevelStepSlugRoute: typeof LearningLevelStepSlugRoute
   LearningLevelIndexRoute: typeof LearningLevelIndexRoute
@@ -488,6 +607,7 @@ const LearningLevelRouteWithChildren = LearningLevelRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LettersRoute: LettersRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   ApiAchievementsRoute: ApiAchievementsRoute,

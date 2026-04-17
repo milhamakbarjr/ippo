@@ -10,7 +10,7 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import "@/styles/globals.css";
 
 /** Routes that show the top navigation bar */
-const TOPBAR_PREFIXES = ['/', '/profile', '/learning'];
+const TOPBAR_PREFIXES = ['/', '/profile', '/learning', '/letters'];
 
 export const Route = createRootRoute({
     head: () => ({
