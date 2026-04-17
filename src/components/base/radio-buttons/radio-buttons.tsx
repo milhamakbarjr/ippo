@@ -5,8 +5,6 @@ import {
     type RadioGroupProps as AriaRadioGroupProps,
     type RadioProps as AriaRadioProps,
 } from "react-aria-components";
-
-export { Radio as AriaRadio } from "react-aria-components";
 import { cx } from "@/utils/cx";
 
 export interface RadioGroupContextType {

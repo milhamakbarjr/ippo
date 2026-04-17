@@ -54,7 +54,7 @@ export const NavButton = ({ current, label, href, icon: Icon, className, tooltip
                     {children && (
                         <span
                             className={cx(
-                                "px-0.5 text-sm font-semibold transition duration-100 ease-linear group-hover/item:text-secondary_hover",
+                                "px-0.5 text-sm font-semibold text-secondary transition duration-100 ease-linear group-hover/item:text-secondary_hover",
                                 current && "text-secondary_hover",
                             )}
                         >

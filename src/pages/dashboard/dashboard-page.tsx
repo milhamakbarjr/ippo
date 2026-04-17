@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { authClient } from '@/lib/auth-client';
 import { useAchievements } from '@/hooks/use-achievements';
 import { Tab, TabList, TabPanel, Tabs } from '@/components/application/tabs/tabs';
-import { SidebarIppo, SIDEBAR_WIDTH } from './components/sidebar-ippo';
+import { TopbarIppo } from './components/topbar-ippo';
 import { StatPills } from './components/stat-pills';
 import { StreakCard } from './components/streak-card';
 import { XpProgressCard } from './components/xp-progress-card';
@@ -71,14 +71,14 @@ export function DashboardPage() {
 
   return (
     <div className="min-h-dvh bg-primary">
-      <SidebarIppo
+      <TopbarIppo
         activeUrl="/"
         items={dashboardNavItems}
         footerItems={dashboardFooterItems}
         showAccountCard
       />
 
-      <main className="lg:pl-(--sidebar-w)" style={{ '--sidebar-w': `${SIDEBAR_WIDTH}px` } as React.CSSProperties}>
+      <main>
         <div className="mx-auto max-w-5xl px-4 py-6">
           {/* Mobile stat pills */}
           <div className="mb-4 lg:hidden">
