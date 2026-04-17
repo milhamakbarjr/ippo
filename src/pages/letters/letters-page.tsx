@@ -26,8 +26,8 @@ export function LettersPage() {
         selectedKey={selectedType}
         onSelectionChange={(key) => setSelectedType(key as CharacterType)}
       >
-        <div className="sticky top-14 z-30 bg-primary pt-2 lg:top-16">
-          <TabList type="underline" size="sm">
+        <div className="sticky top-14 z-30 bg-primary pt-6 pb-4 lg:top-16">
+          <TabList type="button-border" size="sm" className="w-fit">
             {CHARACTER_TABS.map((tab) => (
               <Tab key={tab.id} id={tab.id} label={tab.label} />
             ))}
