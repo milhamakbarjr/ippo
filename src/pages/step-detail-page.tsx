@@ -10,7 +10,7 @@ import { StepResourceLink } from '@/components/application/learning-path/step-re
 import { ConfettiBurst } from '@/components/application/learning-path/confetti-burst';
 import { Button } from '@/components/base/buttons/button';
 import { QuizPrompt } from '@/components/application/quiz-prompt';
-import { Route } from '@/routes/learning/$level.$stepSlug';
+import { Route } from '@/routes/_app/learning/$level.$stepSlug';
 import { useCompleteStep } from '@/hooks/use-complete-step';
 import { isStepComplete, markStepComplete } from '@/utils/guest-progress';
 import type { StepResource } from '@/types/learning';
@@ -157,7 +157,7 @@ export function StepDetailPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-primary pb-[env(safe-area-inset-bottom)]">
+    <div className="pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-2xl mx-auto px-4 pt-6">
         {/* Back button */}
         <Button

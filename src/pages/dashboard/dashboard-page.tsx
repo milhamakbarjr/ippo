@@ -3,14 +3,12 @@ import { useNavigate } from '@tanstack/react-router';
 import { authClient } from '@/lib/auth-client';
 import { useAchievements } from '@/hooks/use-achievements';
 import { Tab, TabList, TabPanel, Tabs } from '@/components/application/tabs/tabs';
-import { SidebarIppo, SIDEBAR_WIDTH } from './components/sidebar-ippo';
 import { StatPills } from './components/stat-pills';
 import { StreakCard } from './components/streak-card';
 import { XpProgressCard } from './components/xp-progress-card';
 import { AchievementsSummaryCard } from './components/achievements-summary-card';
 import { GuestSignupCard } from './components/guest-signup-card';
 import { LevelStepsBlock } from './components/level-steps-block';
-import { dashboardNavItems, dashboardFooterItems } from './components/dashboard-nav-items';
 import { LEVEL_ORDER, LEVEL_LABELS } from '@/content/levels';
 import type { JLPTLevelId } from '@/types/learning';
 
@@ -70,76 +68,67 @@ export function DashboardPage() {
   const streak = achievementsData?.streak;
 
   return (
-    <div className="min-h-dvh bg-primary">
-      <SidebarIppo
-        activeUrl="/"
-        items={dashboardNavItems}
-        footerItems={dashboardFooterItems}
-        showAccountCard
-      />
-
-      <main className="lg:pl-(--sidebar-w)" style={{ '--sidebar-w': `${SIDEBAR_WIDTH}px` } as React.CSSProperties}>
-        <div className="mx-auto max-w-5xl px-4 py-6">
-          {/* Mobile stat pills */}
-          <div className="mb-4 lg:hidden">
-            <StatPills isAuthenticated={isAuthenticated} />
-          </div>
-
-          {/* Mobile guest signup */}
-          {!isAuthenticated && (
-            <div className="mb-4 lg:hidden">
-              <GuestSignupCard />
-            </div>
-          )}
-
-          <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-6">
-            {/* Left column: level tabs + steps */}
-            <div className="space-y-4">
-              <Tabs
-                selectedKey={selectedLevel}
-                onSelectionChange={(key) => setSelectedLevel(key as JLPTLevelId)}
-              >
-                <div className="overflow-x-auto">
-                  <TabList type="underline" size="sm">
-                    {LEVEL_ORDER.map((lvl) => (
-                      <Tab key={lvl} id={lvl} label={LEVEL_LABELS[lvl]} />
-                    ))}
-                  </TabList>
-                </div>
-
-                {LEVEL_ORDER.map((lvl) => (
-                  <TabPanel key={lvl} id={lvl}>
-                    <div className="pt-4">
-                      <LevelStepsBlock
-                        levelId={lvl}
-                        isAuthenticated={isAuthenticated}
-                        userId={session?.user?.id}
-                        userLevel={userLevel}
-                        streak={streak}
-                      />
-                    </div>
-                  </TabPanel>
-                ))}
-              </Tabs>
-            </div>
-
-            {/* Right column: stats + cards (desktop only) */}
-            <aside className="hidden lg:flex lg:flex-col lg:gap-3">
-              <StatPills isAuthenticated={isAuthenticated} />
-              <StreakCard streak={streak} />
-              {isAuthenticated && achievementsData && (
-                <>
-                  <XpProgressCard xp={achievementsData.xp} />
-                  <AchievementsSummaryCard
-                    count={achievementsData.achievements.filter((a) => a.unlocked_at).length}
-                  />
-                </>
-              )}
-              {!isAuthenticated && <GuestSignupCard />}
-            </aside>
-          </div>
+    <main>
+      <div className="mx-auto max-w-5xl px-4 py-6">
+        {/* Mobile stat pills */}
+        <div className="mb-4 lg:hidden">
+          <StatPills isAuthenticated={isAuthenticated} />
         </div>
-      </main>
-    </div>
+
+        {/* Mobile guest signup */}
+        {!isAuthenticated && (
+          <div className="mb-4 lg:hidden">
+            <GuestSignupCard />
+          </div>
+        )}
+
+        <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-6">
+          {/* Left column: level tabs + steps */}
+          <div className="space-y-4">
+            <Tabs
+              selectedKey={selectedLevel}
+              onSelectionChange={(key) => setSelectedLevel(key as JLPTLevelId)}
+            >
+              <div className="overflow-x-auto">
+                <TabList type="underline" size="sm">
+                  {LEVEL_ORDER.map((lvl) => (
+                    <Tab key={lvl} id={lvl} label={LEVEL_LABELS[lvl]} />
+                  ))}
+                </TabList>
+              </div>
+
+              {LEVEL_ORDER.map((lvl) => (
+                <TabPanel key={lvl} id={lvl}>
+                  <div className="pt-4">
+                    <LevelStepsBlock
+                      levelId={lvl}
+                      isAuthenticated={isAuthenticated}
+                      userId={session?.user?.id}
+                      userLevel={userLevel}
+                      streak={streak}
+                    />
+                  </div>
+                </TabPanel>
+              ))}
+            </Tabs>
+          </div>
+
+          {/* Right column: stats + cards (desktop only) */}
+          <aside className="hidden lg:flex lg:flex-col lg:gap-3">
+            <StatPills isAuthenticated={isAuthenticated} />
+            <StreakCard streak={streak} />
+            {isAuthenticated && achievementsData && (
+              <>
+                <XpProgressCard xp={achievementsData.xp} />
+                <AchievementsSummaryCard
+                  count={achievementsData.achievements.filter((a) => a.unlocked_at).length}
+                />
+              </>
+            )}
+            {!isAuthenticated && <GuestSignupCard />}
+          </aside>
+        </div>
+      </div>
+    </main>
   );
 }

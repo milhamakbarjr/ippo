@@ -8,8 +8,7 @@ import {
   ModalOverlay as AriaModalOverlay,
 } from 'react-aria-components';
 import { IppoLogo } from '@/components/foundations/logo/ippo-logo';
-import { ThemeSelector } from '@/components/shared/theme-selector';
-import { NavAccountCard } from '@/components/application/app-navigation/base-components/nav-account-card';
+import { IppoAccountMenu } from '@/components/shared/ippo-account-menu';
 import { NavItemBase } from '@/components/application/app-navigation/base-components/nav-item';
 import { NavList } from '@/components/application/app-navigation/base-components/nav-list';
 import { cx } from '@/utils/cx';
@@ -70,8 +69,7 @@ function SidebarContent({
           </ul>
         )}
         {featureCard}
-        <ThemeSelector />
-        {showAccountCard && <NavAccountCard />}
+        {showAccountCard && <IppoAccountMenu variant="card" />}
       </div>
     </aside>
   );
