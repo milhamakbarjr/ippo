@@ -14,7 +14,7 @@ import { LEVEL_PATH_CONFIGS } from '@/content/sections';
 import { LEVELS } from '@/content/levels';
 import { UNIT_CHARACTER_SECTIONS } from '@/content/kana/unit-content';
 import { Route } from '@/routes/learning/$level.unit.$sectionSlug.$unitSlug';
-import { useCompleteStep } from '@/hooks/use-complete-step';
+import { useCompleteSteps } from '@/hooks/use-complete-step';
 import { useLevelProgress } from '@/hooks/use-level-progress';
 import { isStepComplete, markStepComplete } from '@/utils/guest-progress';
 import type { JLPTLevelId, StepResource } from '@/types/learning';
@@ -72,7 +72,7 @@ export function UnitLearningPage() {
   const stepSlug = allStepSlugs[0];
   const step = stepSlug ? levelData?.steps.find((s) => s.slug === stepSlug) : undefined;
 
-  const mutation = useCompleteStep(user?.id, level);
+  const mutation = useCompleteSteps(user?.id, level);
 
   if (!unit) {
     return (
@@ -108,10 +108,7 @@ export function UnitLearningPage() {
 
     if (user) {
       setShowXP(true);
-      // Mark all step slugs in this unit as complete
-      allStepSlugs.forEach((slug) => {
-        mutation.mutate({ user_id: user.id, level, step_slug: slug });
-      });
+      mutation.mutate({ user_id: user.id, level, step_slugs: allStepSlugs });
     } else {
       allStepSlugs.forEach(markStepComplete);
       toast.success('Selamat! Progres disimpan di browser ini. Buat akun untuk sinkronisasi.', {
