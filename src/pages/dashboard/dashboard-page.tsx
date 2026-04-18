@@ -48,6 +48,11 @@ export function DashboardPage() {
     } catch { /* ignore */ }
   }, [session?.user]);
 
+  // Scroll to top when switching level tabs
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [selectedLevel]);
+
   // Gate: guest with no localStorage level, or authenticated with no level → onboarding
   useEffect(() => {
     if (isPending) return; // still loading

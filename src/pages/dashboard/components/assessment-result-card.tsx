@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/base/buttons/button';
 import { FeaturedIcon } from '@/components/foundations/featured-icon/featured-icon';
 import { GraduationHat01, RefreshCcw01 } from '@untitledui/icons';
 import { levelInfo } from '@/utils/calculate-level';
+import { LEVELS } from '@/content/levels';
+import { getLevelProgress } from '@/utils/guest-progress';
 import type { AssessmentResult, JLPTLevel } from '@/types/assessment';
 
 export function AssessmentResultCard() {
@@ -100,26 +102,45 @@ const JOURNEY_LABELS: Record<JLPTLevel, string> = {
 function JourneyIndicator({ current }: { current: JLPTLevel }) {
   const currentIdx = JOURNEY.indexOf(current);
 
+  // Compute actual completion % per level from localStorage (guest)
+  const progressByLevel = useMemo(() => {
+    const result: Record<JLPTLevel, number> = {} as Record<JLPTLevel, number>;
+    for (const lvl of JOURNEY) {
+      const levelData = LEVELS[lvl];
+      result[lvl] = levelData ? getLevelProgress(levelData).progressPercent : 0;
+    }
+    return result;
+  }, []);
+
   return (
     <div className="flex items-center gap-1">
       {JOURNEY.map((level, i) => {
-        const isPast = i < currentIdx;
         const isCurrent = i === currentIdx;
+        const pct = progressByLevel[level];
+        const isComplete = pct === 100;
+        const hasProgress = pct > 0;
+
         return (
           <div key={level} className="flex items-center gap-1 flex-1">
             <div className="flex flex-col items-center gap-0.5 flex-1">
-              <div
-                className={`w-full h-1.5 rounded-full ${
-                  isPast
-                    ? 'bg-[var(--color-utility-green-600)]'
-                    : isCurrent
-                    ? 'bg-brand-solid'
-                    : 'bg-tertiary'
-                }`}
-              />
+              {/* Track with proportional fill */}
+              <div className="relative w-full h-1.5 rounded-full bg-tertiary overflow-hidden">
+                {pct > 0 && (
+                  <div
+                    className={`absolute left-0 top-0 h-full rounded-full ${
+                      isComplete
+                        ? 'bg-success-primary'
+                        : isCurrent || hasProgress
+                        ? 'bg-brand-solid'
+                        : 'bg-tertiary'
+                    }`}
+                    style={{ width: `${pct}%` }}
+                  />
+                )}
+              </div>
               <span
                 className={`text-[10px] font-medium ${
-                  isCurrent ? 'text-brand-secondary' : isPast ? 'text-success-primary' : 'text-tertiary'
+                  isComplete ? 'text-success-primary' : isCurrent ? 'text-brand-secondary' : 'text-tertiary'
                 }`}
               >
                 {JOURNEY_LABELS[level]}
