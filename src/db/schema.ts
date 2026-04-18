@@ -8,6 +8,7 @@ import {
   index,
   unique,
   text,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 
 // ─── Users ───────────────────────────────────────────────────────────────────
@@ -21,6 +22,7 @@ export const users = pgTable('users', {
   xp:                  integer('xp').default(0).notNull(),
   streak:              integer('streak').default(0).notNull(),
   last_completion_date: timestamp('last_completion_date'),
+  role:                varchar('role', { length: 20 }).default('user').notNull(),
   created_at:          timestamp('created_at').defaultNow(),
   updated_at:          timestamp('updated_at').defaultNow(),
 });
@@ -146,6 +148,76 @@ export const ba_verification = pgTable('ba_verification', {
   updatedAt:  timestamp('updated_at').defaultNow(),
 });
 
+// ─── Quiz Bank ────────────────────────────────────────────────────────────────
+
+export const quiz_bank = pgTable(
+  'quiz_bank',
+  {
+    id:            uuid('id').primaryKey().defaultRandom(),
+    slug:          varchar('slug', { length: 255 }).notNull(),
+    title:         varchar('title', { length: 255 }).notNull(),
+    question_id:   varchar('question_id', { length: 100 }).notNull().unique(),
+    question_text: text('question_text').notNull(),
+    options:       jsonb('options').notNull(),
+    explanation:   text('explanation').notNull(),
+    category:      varchar('category', { length: 20 }).notNull(),
+    level:         varchar('level', { length: 10 }).notNull(),
+    sort_order:    integer('sort_order').default(0).notNull(),
+    created_at:    timestamp('created_at').defaultNow(),
+    updated_at:    timestamp('updated_at').defaultNow(),
+  },
+  (table) => [
+    index('idx_quiz_bank_slug').on(table.slug),
+    index('idx_quiz_bank_level_cat').on(table.level, table.category),
+  ],
+);
+
+// ─── Quiz Submissions ─────────────────────────────────────────────────────────
+
+export const quiz_submissions = pgTable(
+  'quiz_submissions',
+  {
+    id:           uuid('id').primaryKey().defaultRandom(),
+    submitted_by: uuid('submitted_by').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    slug:         varchar('slug', { length: 255 }).notNull(),
+    title:        varchar('title', { length: 255 }).notNull(),
+    level:        varchar('level', { length: 10 }).notNull(),
+    category:     varchar('category', { length: 20 }).notNull(),
+    questions:    jsonb('questions').notNull(),
+    status:       varchar('status', { length: 20 }).default('draft').notNull(),
+    reviewer_id:  uuid('reviewer_id').references(() => users.id),
+    review_note:  text('review_note'),
+    submitted_at: timestamp('submitted_at'),
+    reviewed_at:  timestamp('reviewed_at'),
+    created_at:   timestamp('created_at').defaultNow(),
+    updated_at:   timestamp('updated_at').defaultNow(),
+  },
+  (table) => [
+    index('idx_submissions_status').on(table.status),
+    index('idx_submissions_user').on(table.submitted_by),
+  ],
+);
+
+// ─── Game Results ─────────────────────────────────────────────────────────────
+
+export const game_results = pgTable(
+  'game_results',
+  {
+    id:           uuid('id').primaryKey().defaultRandom(),
+    user_id:      uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    game_type:    varchar('game_type', { length: 50 }).notNull(),
+    level:        varchar('level', { length: 10 }).notNull(),
+    score:        integer('score').notNull(),
+    max_score:    integer('max_score').notNull(),
+    time_seconds: integer('time_seconds'),
+    completed_at: timestamp('completed_at').defaultNow(),
+    created_at:   timestamp('created_at').defaultNow(),
+  },
+  (table) => [
+    index('idx_game_results_user').on(table.user_id, table.completed_at),
+  ],
+);
+
 // ─── Inferred Types ───────────────────────────────────────────────────────────
 
 export type User           = typeof users.$inferSelect;
@@ -162,3 +234,10 @@ export type NewAchievement = typeof achievements.$inferInsert;
 
 export type OtpCode    = typeof otp_codes.$inferSelect;
 export type NewOtpCode = typeof otp_codes.$inferInsert;
+
+export type QuizBankEntry    = typeof quiz_bank.$inferSelect;
+export type NewQuizBankEntry = typeof quiz_bank.$inferInsert;
+export type QuizSubmission    = typeof quiz_submissions.$inferSelect;
+export type NewQuizSubmission = typeof quiz_submissions.$inferInsert;
+export type GameResult        = typeof game_results.$inferSelect;
+export type NewGameResult     = typeof game_results.$inferInsert;

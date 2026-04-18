@@ -85,10 +85,10 @@ beforeEach(() => {
 });
 
 describe('POST /api/progress/complete', () => {
-  it('returns 401 when auth returns non-ok', async () => {
-    vi.mocked(auth.handler).mockResolvedValue(new Response(null, { status: 401 }));
+  it('returns 503 when auth service is unavailable', async () => {
+    vi.mocked(auth.handler).mockResolvedValue(new Response(null, { status: 503 }));
     const res = await handler({ request: makeRequest(validBody) });
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(503);
   });
 
   it('returns 401 when session has no user email', async () => {

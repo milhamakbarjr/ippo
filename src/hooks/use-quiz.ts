@@ -1,27 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuizStore } from '@/stores/quiz-store';
-import type { QuizContent } from '@/types/quiz';
-
-// Dynamic imports for quiz content (code-split per slug)
-const QUIZ_LOADERS: Record<string, () => Promise<{ default: QuizContent }>> = {
-  'kana-mastery': () => import('@/content/quizzes/kana-mastery'),
-  'n5-vocab':   () => import('@/content/quizzes/n5-vocab'),
-  'n5-grammar': () => import('@/content/quizzes/n5-grammar'),
-  'n5-kanji':   () => import('@/content/quizzes/n5-kanji'),
-  'n4-vocab':   () => import('@/content/quizzes/n4-vocab'),
-  'n4-grammar': () => import('@/content/quizzes/n4-grammar'),
-  'n3-vocab':   () => import('@/content/quizzes/n3-vocab'),
-  'n3-grammar': () => import('@/content/quizzes/n3-grammar'),
-  'n3-reading': () => import('@/content/quizzes/n3-reading'),
-  'n2-grammar': () => import('@/content/quizzes/n2-grammar'),
-  'n2-reading': () => import('@/content/quizzes/n2-reading'),
-  'n1-grammar': () => import('@/content/quizzes/n1-grammar'),
-  'n5-review':  () => import('@/content/quizzes/n5-review'),
-  'n4-review':  () => import('@/content/quizzes/n4-review'),
-  'n3-review':  () => import('@/content/quizzes/n3-review'),
-  'n2-review':  () => import('@/content/quizzes/n2-review'),
-  'n1-review':  () => import('@/content/quizzes/n1-review'),
-};
+import type { QuizQuestion } from '@/types/quiz';
 
 export function useQuiz(slug: string) {
   const { initQuiz, questions } = useQuizStore();
@@ -32,21 +11,24 @@ export function useQuiz(slug: string) {
   );
 
   useEffect(() => {
-    const loader = QUIZ_LOADERS[slug];
-    if (!loader) {
-      setError('Quiz not found');
-      setIsLoading(false);
-      return;
-    }
-    loader()
-      .then((mod) => {
-        initQuiz(slug, mod.default.questions);
+    const controller = new AbortController();
+    setIsLoading(true);
+    setError(null);
+    fetch(`/api/quiz-bank/${slug}`, { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error('Quiz not found');
+        return res.json() as Promise<{ questions: QuizQuestion[] }>;
+      })
+      .then((data) => {
+        initQuiz(slug, data.questions);
         setIsLoading(false);
       })
-      .catch(() => {
-        setError('Failed to load quiz');
+      .catch((err: unknown) => {
+        if (err instanceof Error && err.name === 'AbortError') return;
+        setError(err instanceof Error ? err.message : 'Failed to load quiz');
         setIsLoading(false);
       });
+    return () => controller.abort();
   }, [slug, initQuiz]);
 
   useEffect(() => {

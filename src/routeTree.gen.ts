@@ -22,9 +22,11 @@ import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as ApiAchievementsRouteImport } from './routes/api/achievements'
 import { Route as LearningLevelIndexRouteImport } from './routes/learning/$level.index'
+import { Route as ApiQuizBankIndexRouteImport } from './routes/api/quiz-bank/index'
 import { Route as LettersTipsTypeRouteImport } from './routes/letters/tips.$type'
 import { Route as LearningLevelStepSlugRouteImport } from './routes/learning/$level.$stepSlug'
 import { Route as ApiQuizSubmitRouteImport } from './routes/api/quiz/submit'
+import { Route as ApiQuizBankSlugRouteImport } from './routes/api/quiz-bank/$slug'
 import { Route as ApiProgressCompleteRouteImport } from './routes/api/progress/complete'
 import { Route as ApiProgressLevelRouteImport } from './routes/api/progress/$level'
 import { Route as ApiAuthVerifyOtpRouteImport } from './routes/api/auth/verify-otp'
@@ -104,6 +106,11 @@ const LearningLevelIndexRoute = LearningLevelIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LearningLevelRoute,
 } as any)
+const ApiQuizBankIndexRoute = ApiQuizBankIndexRouteImport.update({
+  id: '/api/quiz-bank/',
+  path: '/api/quiz-bank/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LettersTipsTypeRoute = LettersTipsTypeRouteImport.update({
   id: '/tips/$type',
   path: '/tips/$type',
@@ -117,6 +124,11 @@ const LearningLevelStepSlugRoute = LearningLevelStepSlugRouteImport.update({
 const ApiQuizSubmitRoute = ApiQuizSubmitRouteImport.update({
   id: '/api/quiz/submit',
   path: '/api/quiz/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiQuizBankSlugRoute = ApiQuizBankSlugRouteImport.update({
+  id: '/api/quiz-bank/$slug',
+  path: '/api/quiz-bank/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiProgressCompleteRoute = ApiProgressCompleteRouteImport.update({
@@ -208,9 +220,11 @@ export interface FileRoutesByFullPath {
   '/api/auth/verify-otp': typeof ApiAuthVerifyOtpRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
+  '/api/quiz-bank/$slug': typeof ApiQuizBankSlugRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
   '/letters/tips/$type': typeof LettersTipsTypeRouteWithChildren
+  '/api/quiz-bank/': typeof ApiQuizBankIndexRoute
   '/learning/$level/': typeof LearningLevelIndexRoute
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
@@ -237,8 +251,10 @@ export interface FileRoutesByTo {
   '/api/auth/verify-otp': typeof ApiAuthVerifyOtpRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
+  '/api/quiz-bank/$slug': typeof ApiQuizBankSlugRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
+  '/api/quiz-bank': typeof ApiQuizBankIndexRoute
   '/learning/$level': typeof LearningLevelIndexRoute
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
@@ -268,9 +284,11 @@ export interface FileRoutesById {
   '/api/auth/verify-otp': typeof ApiAuthVerifyOtpRoute
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
+  '/api/quiz-bank/$slug': typeof ApiQuizBankSlugRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
   '/letters/tips/$type': typeof LettersTipsTypeRouteWithChildren
+  '/api/quiz-bank/': typeof ApiQuizBankIndexRoute
   '/learning/$level/': typeof LearningLevelIndexRoute
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
   '/api/quiz/$slug/history': typeof ApiQuizSlugHistoryRoute
@@ -301,9 +319,11 @@ export interface FileRouteTypes {
     | '/api/auth/verify-otp'
     | '/api/progress/$level'
     | '/api/progress/complete'
+    | '/api/quiz-bank/$slug'
     | '/api/quiz/submit'
     | '/learning/$level/$stepSlug'
     | '/letters/tips/$type'
+    | '/api/quiz-bank/'
     | '/learning/$level/'
     | '/api/learning/$level/progress'
     | '/api/quiz/$slug/history'
@@ -330,8 +350,10 @@ export interface FileRouteTypes {
     | '/api/auth/verify-otp'
     | '/api/progress/$level'
     | '/api/progress/complete'
+    | '/api/quiz-bank/$slug'
     | '/api/quiz/submit'
     | '/learning/$level/$stepSlug'
+    | '/api/quiz-bank'
     | '/learning/$level'
     | '/api/learning/$level/progress'
     | '/api/quiz/$slug/history'
@@ -360,9 +382,11 @@ export interface FileRouteTypes {
     | '/api/auth/verify-otp'
     | '/api/progress/$level'
     | '/api/progress/complete'
+    | '/api/quiz-bank/$slug'
     | '/api/quiz/submit'
     | '/learning/$level/$stepSlug'
     | '/letters/tips/$type'
+    | '/api/quiz-bank/'
     | '/learning/$level/'
     | '/api/learning/$level/progress'
     | '/api/quiz/$slug/history'
@@ -391,7 +415,9 @@ export interface RootRouteChildren {
   ApiAuthVerifyOtpRoute: typeof ApiAuthVerifyOtpRoute
   ApiProgressLevelRoute: typeof ApiProgressLevelRoute
   ApiProgressCompleteRoute: typeof ApiProgressCompleteRoute
+  ApiQuizBankSlugRoute: typeof ApiQuizBankSlugRoute
   ApiQuizSubmitRoute: typeof ApiQuizSubmitRoute
+  ApiQuizBankIndexRoute: typeof ApiQuizBankIndexRoute
   ApiLearningLevelProgressRoute: typeof ApiLearningLevelProgressRoute
   ApiQuizSlugHistoryRoute: typeof ApiQuizSlugHistoryRoute
 }
@@ -489,6 +515,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearningLevelIndexRouteImport
       parentRoute: typeof LearningLevelRoute
     }
+    '/api/quiz-bank/': {
+      id: '/api/quiz-bank/'
+      path: '/api/quiz-bank'
+      fullPath: '/api/quiz-bank/'
+      preLoaderRoute: typeof ApiQuizBankIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/letters/tips/$type': {
       id: '/letters/tips/$type'
       path: '/tips/$type'
@@ -508,6 +541,13 @@ declare module '@tanstack/react-router' {
       path: '/api/quiz/submit'
       fullPath: '/api/quiz/submit'
       preLoaderRoute: typeof ApiQuizSubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/quiz-bank/$slug': {
+      id: '/api/quiz-bank/$slug'
+      path: '/api/quiz-bank/$slug'
+      fullPath: '/api/quiz-bank/$slug'
+      preLoaderRoute: typeof ApiQuizBankSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/progress/complete': {
@@ -670,7 +710,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthVerifyOtpRoute: ApiAuthVerifyOtpRoute,
   ApiProgressLevelRoute: ApiProgressLevelRoute,
   ApiProgressCompleteRoute: ApiProgressCompleteRoute,
+  ApiQuizBankSlugRoute: ApiQuizBankSlugRoute,
   ApiQuizSubmitRoute: ApiQuizSubmitRoute,
+  ApiQuizBankIndexRoute: ApiQuizBankIndexRoute,
   ApiLearningLevelProgressRoute: ApiLearningLevelProgressRoute,
   ApiQuizSlugHistoryRoute: ApiQuizSlugHistoryRoute,
 }

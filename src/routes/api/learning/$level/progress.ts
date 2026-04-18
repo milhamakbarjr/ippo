@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@/db";
-import { users, progress } from "@/db/schema";
+import { progress } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { auth } from "@/lib/auth";
+import { requireAuth, isAuthError } from "@/server/auth-guard";
 import type { Level } from "@/types/learning";
 import * as kanaContent from "../../../../content/kana/index";
 import * as n5Content from "../../../../content/n5/index";
@@ -37,44 +37,9 @@ export const Route = createFileRoute("/api/learning/$level/progress")({
                     );
                 }
 
-                // Get Better Auth session
-                const sessionRes = await auth.handler(
-                    new Request(
-                        new URL("/api/auth/get-session", request.url),
-                        { headers: request.headers },
-                    ),
-                );
-
-                // Better Auth's get-session returns HTTP 200 with { user: null } for
-                // unauthenticated requests, so !sessionRes.ok only catches real server errors.
-                if (!sessionRes.ok) {
-                    return Response.json({ error: "Auth service unavailable" }, { status: 503 });
-                }
-
-                const sessionData = (await sessionRes.json()) as {
-                    user?: { id: string; email: string } | null;
-                };
-
-                if (!sessionData?.user?.email) {
-                    return Response.json(
-                        { error: "Unauthorized" },
-                        { status: 401 },
-                    );
-                }
-
-                // Find app user by email (progress table references users.id, not ba_user.id)
-                const [appUser] = await db
-                    .select({ id: users.id })
-                    .from(users)
-                    .where(eq(users.email, sessionData.user.email))
-                    .limit(1);
-
-                if (!appUser) {
-                    return Response.json(
-                        { error: "Unauthorized" },
-                        { status: 401 },
-                    );
-                }
+                const authResult = await requireAuth(request);
+                if (isAuthError(authResult)) return authResult;
+                const { appUser } = authResult;
 
                 // Query progress rows for this user + level
                 const progressRows = await db
