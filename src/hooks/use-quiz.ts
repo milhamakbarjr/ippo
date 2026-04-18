@@ -16,6 +16,11 @@ const QUIZ_LOADERS: Record<string, () => Promise<{ default: QuizContent }>> = {
   'n2-grammar': () => import('@/content/quizzes/n2-grammar'),
   'n2-reading': () => import('@/content/quizzes/n2-reading'),
   'n1-grammar': () => import('@/content/quizzes/n1-grammar'),
+  'n5-review':  () => import('@/content/quizzes/n5-review'),
+  'n4-review':  () => import('@/content/quizzes/n4-review'),
+  'n3-review':  () => import('@/content/quizzes/n3-review'),
+  'n2-review':  () => import('@/content/quizzes/n2-review'),
+  'n1-review':  () => import('@/content/quizzes/n1-review'),
 };
 
 export function useQuiz(slug: string) {

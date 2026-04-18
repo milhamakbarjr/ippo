@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/base/buttons/button';
 import { FeaturedIcon } from '@/components/foundations/featured-icon/featured-icon';
@@ -103,11 +103,14 @@ function JourneyIndicator({ current }: { current: JLPTLevel }) {
   const currentIdx = JOURNEY.indexOf(current);
 
   // Compute actual completion % per level from localStorage (guest)
-  const progressByLevel: Record<JLPTLevel, number> = {} as Record<JLPTLevel, number>;
-  for (const lvl of JOURNEY) {
-    const levelData = LEVELS[lvl];
-    progressByLevel[lvl] = levelData ? getLevelProgress(levelData).progressPercent : 0;
-  }
+  const progressByLevel = useMemo(() => {
+    const result: Record<JLPTLevel, number> = {} as Record<JLPTLevel, number>;
+    for (const lvl of JOURNEY) {
+      const levelData = LEVELS[lvl];
+      result[lvl] = levelData ? getLevelProgress(levelData).progressPercent : 0;
+    }
+    return result;
+  }, []);
 
   return (
     <div className="flex items-center gap-1">
@@ -126,7 +129,7 @@ function JourneyIndicator({ current }: { current: JLPTLevel }) {
                   <div
                     className={`absolute left-0 top-0 h-full rounded-full ${
                       isComplete
-                        ? 'bg-[var(--color-utility-green-600)]'
+                        ? 'bg-success-primary'
                         : isCurrent || hasProgress
                         ? 'bg-brand-solid'
                         : 'bg-tertiary'
