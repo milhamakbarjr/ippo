@@ -1,28 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { auth } from '@/lib/auth';
 import { db } from '@/db';
-import { quiz_results, users } from '@/db/schema';
+import { quiz_results } from '@/db/schema';
+import { requireAuth, isAuthError } from '@/server/auth-guard';
 import { eq, and, desc } from 'drizzle-orm';
 
 export const Route = createFileRoute('/api/quiz/$slug/history')({
   server: {
     handlers: {
       GET: async ({ request, params }) => {
-        const sessionRes = await auth.handler(
-          new Request(new URL('/api/auth/get-session', request.url), {
-            method: 'GET', headers: request.headers,
-          })
-        );
-        if (!sessionRes.ok) return Response.json({ error: 'Unauthorized' }, { status: 401 });
-        const sessionData = (await sessionRes.json()) as { user?: { email?: string } | null } | null;
-        if (!sessionData?.user?.email) return Response.json({ error: 'Unauthorized' }, { status: 401 });
-
-        const [appUser] = await db
-          .select({ id: users.id })
-          .from(users)
-          .where(eq(users.email, sessionData.user.email))
-          .limit(1);
-        if (!appUser) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+        const authResult = await requireAuth(request);
+        if (isAuthError(authResult)) return authResult;
+        const { appUser } = authResult;
 
         const attempts = await db
           .select({ score: quiz_results.score, total: quiz_results.total_questions, completed_at: quiz_results.completed_at })

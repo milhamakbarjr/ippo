@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { db } from '@/db';
 import { progress, users } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
-import { auth } from '@/lib/auth';
+import { requireAuth, isAuthError } from '@/server/auth-guard';
 import { updateStreak } from '@/lib/streak';
 import { checkAchievements } from '@/server/achievements';
 import { level as kanaLevel } from '@/content/kana/index';
@@ -32,34 +32,12 @@ export const Route = createFileRoute('/api/progress/complete')({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // 1. Auth check — proxy to Better Auth get-session
-        const sessionRes = await auth.handler(
-          new Request(
-            new URL('/api/auth/get-session', request.url),
-            { method: 'GET', headers: request.headers }
-          )
-        );
-        if (!sessionRes.ok) {
-          return Response.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-        const sessionData = (await sessionRes.json()) as {
-          user?: { id?: string; email?: string } | null;
-        } | null;
-        if (!sessionData?.user?.email) {
-          return Response.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        // 1. Auth check
+        const authResult = await requireAuth(request);
+        if (isAuthError(authResult)) return authResult;
+        const { appUser } = authResult;
 
-        // 2. Find app user by email
-        const [appUser] = await db
-          .select({ id: users.id, xp: users.xp })
-          .from(users)
-          .where(eq(users.email, sessionData.user.email))
-          .limit(1);
-        if (!appUser) {
-          return Response.json({ error: 'User not found' }, { status: 404 });
-        }
-
-        // 3. Validate body
+        // 2. Validate body
         let body: unknown;
         try {
           body = await request.json();

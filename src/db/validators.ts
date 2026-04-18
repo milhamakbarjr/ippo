@@ -74,3 +74,56 @@ export const VerifyOtpSchema = z.object({
   }).optional(),
 });
 export type VerifyOtp = z.infer<typeof VerifyOtpSchema>;
+
+// ─── Quiz Bank ────────────────────────────────────────────────────────────────
+
+export const QuizCategorySchema = z.enum(['vocab', 'kanji', 'grammar', 'reading']);
+export type QuizCategory = z.infer<typeof QuizCategorySchema>;
+
+export const QuizOptionSchema = z.object({
+  id:        z.string(),
+  text:      z.string().min(1),
+  isCorrect: z.boolean(),
+});
+export type QuizOption = z.infer<typeof QuizOptionSchema>;
+
+export const QuizQuestionInputSchema = z.object({
+  id:           z.string().min(1),
+  questionText: z.string().min(1),
+  options:      z.array(QuizOptionSchema).length(4),
+  explanation:  z.string().min(1),
+  category:     QuizCategorySchema,
+  level:        JLPTLevelSchema,
+});
+export type QuizQuestionInput = z.infer<typeof QuizQuestionInputSchema>;
+
+export const QuizBankInsertSchema = z.object({
+  slug:          z.string().min(1).max(255),
+  title:         z.string().min(1).max(255),
+  question_id:   z.string().min(1).max(100),
+  question_text: z.string().min(1),
+  options:       z.array(QuizOptionSchema).length(4),
+  explanation:   z.string().min(1),
+  category:      QuizCategorySchema,
+  level:         JLPTLevelSchema,
+  sort_order:    z.number().int().default(0),
+});
+export type QuizBankInsert = z.infer<typeof QuizBankInsertSchema>;
+
+export const QuizSubmissionCreateSchema = z.object({
+  slug:      z.string().min(1).max(255),
+  title:     z.string().min(1).max(255),
+  level:     JLPTLevelSchema,
+  category:  QuizCategorySchema,
+  questions: z.array(QuizQuestionInputSchema).min(1).max(50),
+});
+export type QuizSubmissionCreate = z.infer<typeof QuizSubmissionCreateSchema>;
+
+export const GameResultSubmitSchema = z.object({
+  game_type:    z.enum(['flashcard-match', 'word-sort']),
+  level:        JLPTLevelSchema,
+  score:        z.number().int().min(0),
+  max_score:    z.number().int().min(1),
+  time_seconds: z.number().int().min(0).optional(),
+});
+export type GameResultSubmit = z.infer<typeof GameResultSubmitSchema>;
