@@ -5,6 +5,7 @@ import { Tab, TabList, TabPanel, Tabs } from '@/components/application/tabs/tabs
 import { BadgeWithDot } from '@/components/base/badges/badges';
 import { submissionBadgeColor, submissionStatusLabel, formatSubmissionDate, CATEGORY_LABELS } from '@/utils/submission-status';
 import { LEVEL_LABELS } from '@/content/levels';
+import type { JLPTLevelId } from '@/types/learning';
 
 type AdminSubmissionListItem = {
   id: string;
@@ -105,7 +106,7 @@ export function AdminSubmissionsListPage() {
                           {sub.title}
                         </p>
                         <p className="mt-0.5 truncate text-xs text-tertiary">
-                          {sub.slug} &middot; {(LEVEL_LABELS as Record<string, string>)[sub.level] ?? `Level ${sub.level.toUpperCase()}`} &middot; {CATEGORY_LABELS[sub.category] ?? sub.category} &middot; {sub.question_count} soal
+                          {sub.slug} &middot; {LEVEL_LABELS[sub.level as JLPTLevelId] ?? sub.level.toUpperCase()} &middot; {CATEGORY_LABELS[sub.category] ?? sub.category} &middot; {sub.question_count} soal
                         </p>
                         <p className="mt-0.5 text-xs text-tertiary">
                           {sub.submitter.name ?? sub.submitter.email} &middot; {formatSubmissionDate(sub.status === 'draft' ? sub.created_at : (sub.submitted_at ?? sub.created_at))}

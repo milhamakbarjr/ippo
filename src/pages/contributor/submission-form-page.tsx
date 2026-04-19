@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from '@untitledui/icons';
 import type { QuizSubmission } from '@/db/schema';
 import type { QuizQuestionInput } from '@/db/validators';
@@ -48,6 +48,7 @@ function blankQuestion(level: string, category: string): QuizQuestionInput {
 
 export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isEditMode = !!submissionId;
 
   const [title, setTitle] = useState('');
@@ -118,6 +119,9 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
         throw new Error(err.error ?? 'Gagal menyimpan submission');
       }
       return res.json() as Promise<SubmissionResponse>;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(['contributor', 'submission', data.submission.id], data);
     },
   });
 

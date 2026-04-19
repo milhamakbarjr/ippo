@@ -7,7 +7,9 @@ import { AvatarLabelGroup } from '@/components/base/avatar/avatar-label-group';
 import { QuizQuestionInputSchema } from '@/db/validators';
 import type { QuizQuestionInput } from '@/db/validators';
 import { z } from 'zod';
+
 import { submissionBadgeColor, submissionStatusLabel, formatSubmissionDate } from '@/utils/submission-status';
+import { SubmissionQuestionsList } from '@/components/application/submission-questions-list';
 
 type AdminSubmissionDetail = {
   id: string;
@@ -118,7 +120,6 @@ export function AdminSubmissionDetailPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6">
-      {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <Button
@@ -143,9 +144,7 @@ export function AdminSubmissionDetailPage() {
         </BadgeWithDot>
       </div>
 
-      {/* Metadata card */}
       <div className="mb-6 rounded-xl border border-secondary bg-primary p-4 flex flex-col gap-3">
-        {/* Submitter row */}
         <div>
           <p className="text-xs font-medium text-tertiary mb-1.5">Kontributor</p>
           <AvatarLabelGroup
@@ -155,7 +154,6 @@ export function AdminSubmissionDetailPage() {
           />
         </div>
 
-        {/* Metadata rows */}
         <div className="grid grid-cols-2 gap-2 pt-2 border-t border-secondary text-sm">
           <div>
             <p className="text-xs text-tertiary">Dikirim</p>
@@ -180,7 +178,6 @@ export function AdminSubmissionDetailPage() {
         </div>
       </div>
 
-      {/* Rejection note */}
       {sub.status === 'rejected' && sub.review_note && (
         <div className="mb-6 rounded-xl border border-error bg-primary px-4 py-3">
           <p className="text-xs font-semibold text-error-primary">Catatan Penolakan</p>
@@ -188,52 +185,11 @@ export function AdminSubmissionDetailPage() {
         </div>
       )}
 
-      {/* Questions */}
-      <div className="mb-6 space-y-4">
-        <h2 className="text-sm font-semibold text-secondary">
-          Pertanyaan ({questions.length})
-        </h2>
-
-        {questions.map((q, qIdx) => (
-          <div
-            key={q.id}
-            className="rounded-xl border border-secondary bg-primary p-4"
-          >
-            <p className="text-sm font-medium text-primary">
-              {qIdx + 1}. {q.questionText}
-            </p>
-            <ul className="mt-3 space-y-2">
-              {q.options.map((opt) => (
-                <li
-                  key={opt.id}
-                  className="flex items-center gap-2 text-sm"
-                >
-                  {opt.isCorrect ? (
-                    <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-success-primary">
-                      <span className="block size-2 rounded-full bg-white" />
-                    </span>
-                  ) : (
-                    <span className="size-4 shrink-0 rounded-full border border-secondary" />
-                  )}
-                  <span className={opt.isCorrect ? 'font-medium text-success-primary' : 'text-tertiary'}>
-                    {opt.text}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            {q.explanation && (
-              <p className="mt-3 border-t border-secondary pt-3 text-xs text-tertiary">
-                <span className="font-medium">Penjelasan:</span> {q.explanation}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
+      <SubmissionQuestionsList questions={questions} />
 
       {/* Actions for pending_review */}
       {isPending && (
         <div className="space-y-3">
-          {/* Approve */}
           <div className="flex gap-3">
             <Button
               color="primary"
@@ -254,7 +210,6 @@ export function AdminSubmissionDetailPage() {
             </Button>
           </div>
 
-          {/* Reject form */}
           {showRejectForm && (
             <div className="rounded-xl border border-secondary bg-primary p-4">
               <label

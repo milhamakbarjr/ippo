@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { db } from '@/db';
 import { quiz_submissions, users } from '@/db/schema';
 import { requireAuth, isAuthError, requireAdminRole } from '@/server/auth-guard';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, sql } from 'drizzle-orm';
 
 export const Route = createFileRoute('/api/admin/submissions/')({
   server: {
@@ -31,7 +31,7 @@ export const Route = createFileRoute('/api/admin/submissions/')({
             title: quiz_submissions.title,
             level: quiz_submissions.level,
             category: quiz_submissions.category,
-            questions: quiz_submissions.questions,
+            question_count: sql<number>`jsonb_array_length(${quiz_submissions.questions})`,
             status: quiz_submissions.status,
             reviewer_id: quiz_submissions.reviewer_id,
             review_note: quiz_submissions.review_note,
@@ -47,10 +47,9 @@ export const Route = createFileRoute('/api/admin/submissions/')({
           .where(status ? eq(quiz_submissions.status, status) : undefined)
           .orderBy(desc(quiz_submissions.created_at));
 
-        const submissions = rows.map(({ questions, submitter_name, submitter_email, ...rest }) => ({
+        const submissions = rows.map(({ submitter_name, submitter_email, ...rest }) => ({
           ...rest,
           submitter: { id: rest.submitted_by, name: submitter_name ?? null, email: submitter_email ?? '' },
-          question_count: Array.isArray(questions) ? (questions as unknown[]).length : 0,
         }));
 
         return Response.json({ submissions });

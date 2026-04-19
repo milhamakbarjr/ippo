@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { db } from '@/db';
+import { txDb } from '@/db';
 import { quiz_submissions, quiz_bank } from '@/db/schema';
 import { requireAuth, isAuthError, requireAdminRole } from '@/server/auth-guard';
 import { eq } from 'drizzle-orm';
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/api/admin/submissions/$id/approve')({
 
         let questionsAdded: number;
         try {
-          questionsAdded = await db.transaction(async (tx) => {
+          questionsAdded = await txDb.transaction(async (tx) => {
             const [submission] = await tx
               .select()
               .from(quiz_submissions)

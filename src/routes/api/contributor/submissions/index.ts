@@ -3,7 +3,7 @@ import { db } from '@/db';
 import { quiz_submissions } from '@/db/schema';
 import { QuizSubmissionCreateSchema } from '@/db/validators';
 import { requireAuth, isAuthError, requireContributorRole } from '@/server/auth-guard';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, sql } from 'drizzle-orm';
 
 export const Route = createFileRoute('/api/contributor/submissions/')({
   server: {
@@ -24,7 +24,7 @@ export const Route = createFileRoute('/api/contributor/submissions/')({
             title: quiz_submissions.title,
             level: quiz_submissions.level,
             category: quiz_submissions.category,
-            questions: quiz_submissions.questions,
+            question_count: sql<number>`jsonb_array_length(${quiz_submissions.questions})`,
             status: quiz_submissions.status,
             review_note: quiz_submissions.review_note,
             submitted_at: quiz_submissions.submitted_at,
@@ -36,12 +36,7 @@ export const Route = createFileRoute('/api/contributor/submissions/')({
           .where(eq(quiz_submissions.submitted_by, appUser.id))
           .orderBy(desc(quiz_submissions.created_at));
 
-        const submissions = rows.map(({ questions, ...rest }) => ({
-          ...rest,
-          question_count: Array.isArray(questions) ? (questions as unknown[]).length : 0,
-        }));
-
-        return Response.json({ submissions });
+        return Response.json({ submissions: rows });
       },
 
       POST: async ({ request }) => {

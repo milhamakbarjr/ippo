@@ -5,6 +5,7 @@ import { BadgeWithDot } from '@/components/base/badges/badges';
 import { QuizQuestionInputSchema } from '@/db/validators';
 import type { QuizQuestionInput } from '@/db/validators';
 import { z } from 'zod';
+
 import {
   submissionBadgeColor,
   submissionStatusLabel,
@@ -13,6 +14,7 @@ import {
 } from '@/utils/submission-status';
 import { LEVEL_LABELS } from '@/content/levels';
 import type { JLPTLevelId } from '@/types/learning';
+import { SubmissionQuestionsList } from '@/components/application/submission-questions-list';
 
 type ContributorSubmissionDetail = {
   id: string;
@@ -44,7 +46,7 @@ export function ContributorSubmissionDetailPage({ submissionId }: ContributorSub
       if (!res.ok) throw new Error('Submission tidak ditemukan');
       return res.json() as Promise<{ submission: ContributorSubmissionDetail }>;
     },
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 10,
   });
 
   if (isLoading) {
@@ -85,7 +87,6 @@ export function ContributorSubmissionDetailPage({ submissionId }: ContributorSub
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6">
-      {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <Button
@@ -110,7 +111,6 @@ export function ContributorSubmissionDetailPage({ submissionId }: ContributorSub
         </BadgeWithDot>
       </div>
 
-      {/* Metadata card */}
       <div className="mb-6 grid grid-cols-2 gap-3 rounded-xl border border-secondary bg-primary p-4">
         <div>
           <p className="text-xs text-tertiary">Dikirim</p>
@@ -134,7 +134,6 @@ export function ContributorSubmissionDetailPage({ submissionId }: ContributorSub
         </div>
       </div>
 
-      {/* Rejection note */}
       {sub.status === 'rejected' && sub.review_note && (
         <div className="mb-6 rounded-xl border border-error bg-primary px-4 py-3">
           <p className="text-xs font-semibold text-error-primary">Catatan Penolakan</p>
@@ -142,49 +141,8 @@ export function ContributorSubmissionDetailPage({ submissionId }: ContributorSub
         </div>
       )}
 
-      {/* Questions */}
-      <div className="mb-6 space-y-4">
-        <h2 className="text-sm font-semibold text-secondary">
-          Pertanyaan ({questions.length})
-        </h2>
+      <SubmissionQuestionsList questions={questions} />
 
-        {questions.map((q, qIdx) => (
-          <div
-            key={q.id}
-            className="rounded-xl border border-secondary bg-primary p-4"
-          >
-            <p className="text-sm font-medium text-primary">
-              {qIdx + 1}. {q.questionText}
-            </p>
-            <ul className="mt-3 space-y-2">
-              {q.options.map((opt) => (
-                <li
-                  key={opt.id}
-                  className="flex items-center gap-2 text-sm"
-                >
-                  {opt.isCorrect ? (
-                    <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-success-primary">
-                      <span className="block size-2 rounded-full bg-white" />
-                    </span>
-                  ) : (
-                    <span className="size-4 shrink-0 rounded-full border border-secondary" />
-                  )}
-                  <span className={opt.isCorrect ? 'font-medium text-success-primary' : 'text-tertiary'}>
-                    {opt.text}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            {q.explanation && (
-              <p className="mt-3 border-t border-secondary pt-3 text-xs text-tertiary">
-                <span className="font-medium">Penjelasan:</span> {q.explanation}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Edit button for drafts */}
       {isDraft && (
         <Button
           color="primary"

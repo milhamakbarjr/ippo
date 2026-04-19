@@ -36,10 +36,18 @@ export function MySubmissionsPage() {
         if (!r.ok) throw new Error('Gagal memuat submissions');
         return r.json() as Promise<SubmissionsResponse>;
       }),
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 10,
   });
 
   const submissions = data?.submissions ?? [];
+
+  const handleRowClick = (s: SubmissionListItem) => {
+    if (s.status === 'draft') {
+      void navigate({ to: '/contributor/submissions/$id/edit', params: { id: s.id } });
+    } else {
+      void navigate({ to: '/contributor/submissions/$id', params: { id: s.id } });
+    }
+  };
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6 flex flex-col gap-6">
@@ -84,21 +92,11 @@ export function MySubmissionsPage() {
                 role="button"
                 tabIndex={0}
                 className="flex items-start justify-between gap-4 px-4 py-3 cursor-pointer transition duration-100 ease-linear hover:bg-primary_hover focus-visible:outline-2 focus-visible:outline-brand"
-                onClick={() => {
-                  if (s.status === 'draft') {
-                    void navigate({ to: '/contributor/submissions/$id/edit', params: { id: s.id } });
-                  } else {
-                    void navigate({ to: '/contributor/submissions/$id', params: { id: s.id } });
-                  }
-                }}
+                onClick={() => handleRowClick(s)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    if (s.status === 'draft') {
-                      void navigate({ to: '/contributor/submissions/$id/edit', params: { id: s.id } });
-                    } else {
-                      void navigate({ to: '/contributor/submissions/$id', params: { id: s.id } });
-                    }
+                    handleRowClick(s);
                   }
                 }}
               >
