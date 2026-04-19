@@ -4,6 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/base/buttons/button';
 import { BadgeWithDot } from '@/components/base/badges/badges';
 import { AvatarLabelGroup } from '@/components/base/avatar/avatar-label-group';
+import { TextArea } from '@/components/base/textarea/textarea';
 import { QuizQuestionInputSchema } from '@/db/validators';
 import type { QuizQuestionInput } from '@/db/validators';
 import { z } from 'zod';
@@ -212,19 +213,13 @@ export function AdminSubmissionDetailPage() {
 
           {showRejectForm && (
             <div className="rounded-xl border border-secondary bg-primary p-4">
-              <label
-                htmlFor="review-note"
-                className="mb-1.5 block text-sm font-medium text-secondary"
-              >
-                Catatan Penolakan
-              </label>
-              <textarea
-                id="review-note"
+              <TextArea
+                label="Catatan Penolakan"
                 rows={3}
                 value={reviewNote}
-                onChange={(e) => setReviewNote(e.target.value)}
+                onChange={setReviewNote}
                 placeholder="Jelaskan alasan penolakan..."
-                className="w-full rounded-lg border border-primary bg-primary px-3 py-2 text-sm text-primary placeholder:text-placeholder focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:opacity-50"
+                size="sm"
               />
               {rejectMutation.error && (
                 <p className="mt-1 text-xs text-error-primary">
