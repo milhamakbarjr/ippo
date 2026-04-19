@@ -4,6 +4,7 @@ import { Button } from '@/components/base/buttons/button';
 import { TextArea } from '@/components/base/textarea/textarea';
 import { Input } from '@/components/base/input/input';
 import { Label } from '@/components/base/input/label';
+import { RadioGroup, RadioButton } from '@/components/base/radio-buttons/radio-buttons';
 
 interface QuestionFormProps {
   value: QuizQuestionInput;
@@ -56,27 +57,28 @@ export function QuestionForm({ value, onChange, onRemove, index }: QuestionFormP
 
       <div className="flex flex-col gap-3">
         <Label>Pilihan Jawaban</Label>
-        {value.options.map((option, optIdx) => (
-          <div key={option.id} className="flex items-center gap-3">
-            <input
-              type="radio"
-              name={`correct-answer-${value.id}`}
-              id={`correct-${value.id}-${optIdx}`}
-              checked={correctIndex === optIdx}
-              onChange={() => handleCorrectAnswer(optIdx)}
-              className="size-4 shrink-0 cursor-pointer accent-brand-solid"
-              aria-label="Jawaban benar"
-              title="Jawaban benar"
-            />
-            <Input
-              aria-label={`Pilihan ${String.fromCharCode(65 + optIdx)}`}
-              placeholder={`Pilihan ${String.fromCharCode(65 + optIdx)}`}
-              value={option.text}
-              onChange={(v) => handleOptionText(optIdx, v)}
-              className="flex-1"
-            />
-          </div>
-        ))}
+        <RadioGroup
+          value={correctIndex.toString()}
+          onChange={(val) => handleCorrectAnswer(Number(val))}
+          aria-label="Pilih jawaban benar"
+          className="gap-3"
+        >
+          {value.options.map((option, optIdx) => (
+            <div key={option.id} className="flex items-center gap-3">
+              <RadioButton
+                value={optIdx.toString()}
+                aria-label={`Tandai pilihan ${String.fromCharCode(65 + optIdx)} sebagai jawaban benar`}
+              />
+              <Input
+                aria-label={`Pilihan ${String.fromCharCode(65 + optIdx)}`}
+                placeholder={`Pilihan ${String.fromCharCode(65 + optIdx)}`}
+                value={option.text}
+                onChange={(v) => handleOptionText(optIdx, v)}
+                className="flex-1"
+              />
+            </div>
+          ))}
+        </RadioGroup>
         <p className="text-xs text-tertiary">Pilih tombol radio di kiri untuk menandai jawaban benar</p>
       </div>
 

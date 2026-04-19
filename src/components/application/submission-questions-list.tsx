@@ -1,4 +1,5 @@
 import type { QuizQuestionInput } from '@/db/validators';
+import { BadgeWithDot } from '@/components/base/badges/badges';
 
 interface SubmissionQuestionsListProps {
   questions: QuizQuestionInput[];
@@ -21,17 +22,14 @@ export function SubmissionQuestionsList({ questions }: SubmissionQuestionsListPr
           </p>
           <ul className="mt-3 space-y-2">
             {q.options.map((opt) => (
-              <li key={opt.id} className="flex items-center gap-2 text-sm">
+              <li key={opt.id} className="flex items-center gap-2">
                 {opt.isCorrect ? (
-                  <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-success-primary">
-                    <span className="block size-2 rounded-full bg-white" />
-                  </span>
+                  <BadgeWithDot color="success" size="sm">
+                    {opt.text}
+                  </BadgeWithDot>
                 ) : (
-                  <span className="size-4 shrink-0 rounded-full border border-secondary" />
+                  <span className="text-sm text-tertiary">{opt.text}</span>
                 )}
-                <span className={opt.isCorrect ? 'font-medium text-success-primary' : 'text-tertiary'}>
-                  {opt.text}
-                </span>
               </li>
             ))}
           </ul>
