@@ -38,8 +38,8 @@ export type AssessmentSubmit = z.infer<typeof AssessmentSubmitSchema>;
 export const QuizSubmitSchema = z.object({
   quiz_slug:       z.string().min(1).max(255),
   level:           JLPTLevelSchema.optional(),
-  score:           z.number().int().min(0).max(20),
-  total_questions: z.number().int().min(1).max(20),
+  score:           z.number().int().min(0).max(100),
+  total_questions: z.number().int().min(1).max(100),
 }).refine((d) => d.score <= d.total_questions, {
   message: 'score cannot exceed total_questions',
   path: ['score'],
@@ -112,13 +112,28 @@ export const QuizBankInsertSchema = z.object({
 export type QuizBankInsert = z.infer<typeof QuizBankInsertSchema>;
 
 export const QuizSubmissionCreateSchema = z.object({
-  slug:      z.string().min(1).max(255),
-  title:     z.string().min(1).max(255),
-  level:     JLPTLevelSchema,
-  category:  QuizCategorySchema,
-  questions: z.array(QuizQuestionInputSchema).min(1).max(50),
+  slug:        z.string().min(1).max(255),
+  title:       z.string().min(1).max(255),
+  description: z.string().max(500).optional(),
+  level:       JLPTLevelSchema,
+  category:    QuizCategorySchema,
+  questions:   z.array(QuizQuestionInputSchema).min(1).max(50),
 });
 export type QuizSubmissionCreate = z.infer<typeof QuizSubmissionCreateSchema>;
+
+export const QuizSetTypeSchema = z.enum(['category', 'exam']);
+export type QuizSetType = z.infer<typeof QuizSetTypeSchema>;
+
+export const QuizSetCreateSchema = z.object({
+  slug:          z.string().min(1).max(255),
+  title:         z.string().min(1).max(255),
+  description:   z.string().optional(),
+  level:         JLPTLevelSchema,
+  set_type:      QuizSetTypeSchema.default('category'),
+  categories:    z.array(QuizCategorySchema).min(1),
+  submission_id: z.string().uuid().optional(),
+});
+export type QuizSetCreate = z.infer<typeof QuizSetCreateSchema>;
 
 export const GameResultSubmitSchema = z.object({
   game_type:    z.enum(['flashcard-match', 'word-sort']),

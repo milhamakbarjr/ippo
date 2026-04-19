@@ -59,7 +59,7 @@ export const Route = createFileRoute('/api/contributor/submissions/')({
           return Response.json({ error: parsed.error.message }, { status: 400 });
         }
 
-        const { slug, title, level, category, questions } = parsed.data;
+        const { slug, title, description, level, category, questions } = parsed.data;
 
         const [submission] = await db
           .insert(quiz_submissions)
@@ -67,6 +67,7 @@ export const Route = createFileRoute('/api/contributor/submissions/')({
             submitted_by: appUser.id,
             slug,
             title,
+            description,
             level,
             category,
             questions,

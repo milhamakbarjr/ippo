@@ -1,8 +1,8 @@
-# Sprint: Content Pipeline + Mini-Games
+# Sprint: Content Pipeline + JLPT Quiz Catalog
 
 ## Overview
 
-Migrating quiz content from static TypeScript files to a DB-backed system with contributor workflows, and adding level-specific mini-games.
+DB-backed quiz system with contributor workflows, JLPT-format quiz catalog, and level-specific mini-games.
 
 ---
 
@@ -20,162 +20,181 @@ Migrating quiz content from static TypeScript files to a DB-backed system with c
 - [x] Export inferred types: `QuizBankEntry`, `QuizSubmission`, `GameResult` (+ New* variants)
 
 #### Validators (`src/db/validators.ts`)
-- [x] Add Zod schema for `quiz_bank` insert (`QuizBankInsertSchema`)
-- [x] Add Zod schema for `quiz_submissions` create (`QuizSubmissionCreateSchema`)
-- [x] Add Zod schema for `game_results` insert (`GameResultSubmitSchema`)
-- [x] Add `QuizOptionSchema` (shared)
+- [x] Add Zod schemas: `QuizBankInsertSchema`, `QuizSubmissionCreateSchema`, `GameResultSubmitSchema`, `QuizOptionSchema`
 
 #### Auth Guard (`src/server/auth-guard.ts`)
-- [x] Extract session-check + user-lookup pattern from existing routes
-- [x] `requireAuth(request)` returns `AuthGuardSuccess | Response`
-- [x] `isAuthError(result)` type guard
+- [x] `requireAuth(request)`, `isAuthError(result)`, role guards
 
-#### Migration
-- [x] `npx drizzle-kit generate` — `drizzle/0004_wealthy_talos.sql` generated
-- [x] `npx drizzle-kit push` — applied via Neon MCP
+#### Migration + Seed
+- [x] Migration applied via Neon MCP
+- [x] 127 questions across 17 quizzes seeded into `quiz_bank`
 
-#### Seed Script (`src/scripts/seed-quiz-bank.ts`)
-- [x] Imports all 17 static quiz files
-- [x] Inserts all questions into `quiz_bank` with correct slug, sort_order, category, level
-- [x] Idempotent via `onConflictDoNothing()` on `question_id`
-- [x] Seeded: 127 questions across all 17 quizzes (verified in Neon)
-
-#### API Routes
-- [x] `GET /api/quiz-bank/$slug` — returns quiz with questions, `isCompleted` for auth users
-- [x] `GET /api/quiz-bank` — returns list of published quiz metadata + `completedSlugs[]` for auth users
-
-#### Hook Update (`src/hooks/use-quiz.ts`)
-- [x] Replace `QUIZ_LOADERS` dynamic imports with `fetch('/api/quiz-bank/${slug}')`
-- [x] Preserve existing `isLoading`, `error`, `isOnline`, `questions` return shape
-- [x] `quiz-store.ts` unchanged
-
-#### Build Config
-- [x] `tsconfig.app.json` excludes `src/scripts/` (CLI-only, not part of app bundle)
-
-#### Quiz Completion UI
-- [ ] Completion indicator shown on quiz cards (Phase 2 scope — deferred)
-
-### Verification
-- [x] `npm run build` passes with no TypeScript errors
-- [x] All 17 quizzes seeded in DB (127 questions verified via Neon MCP)
-- [ ] Existing quiz flow (play → submit → score) works end-to-end (manual browser test)
+#### API Routes + Hook
+- [x] `GET /api/quiz-bank/$slug` and `GET /api/quiz-bank` endpoints
+- [x] `use-quiz.ts` fetches from DB API instead of static imports
 
 ---
 
-## Phase 2: Admin + Contributor Pages
+## Phase 2: Admin + Contributor CMS
 **Branch:** `feat/phase2-admin-contributor`
-**Status:** ⏳ Pending Phase 1
+**Status:** ✅ Complete
 
 ### Checklist
 
-#### Admin Routes + Pages
-- [ ] `/admin` layout route with role guard (redirect non-admins to `/`)
-- [ ] `/admin/submissions` — list with status filter tabs (draft/pending/published/rejected)
-- [ ] `/admin/submissions/$id` — detail + approve/reject actions
-- [ ] `/admin/quiz-bank` — browse all published quizzes
-- [ ] `/admin/quiz-bank/$slug` — view published quiz detail
+#### Admin
+- [x] `/admin` layout route with role guard
+- [x] `/admin/submissions` — list with status tabs, submitter name, question count
+- [x] `/admin/submissions/$id` — detail with metadata card (submitter, dates, reviewer) + approve/reject
+- [x] Approve uses `txDb.transaction()` (neon-serverless WebSocket driver) for atomic quiz_bank insert + status update
 
-#### Contributor Routes + Pages
-- [ ] `/contributor` layout route with role guard (redirect non-contributors to `/`)
-- [ ] `/contributor/submissions` — my submissions list
-- [ ] `/contributor/submissions/new` — create new quiz submission (form UI)
-- [ ] `/contributor/submissions/$id/edit` — edit draft submission
-
-#### Question Form (`src/pages/contributor/components/question-form.tsx`)
-- [ ] Fields: questionText, 4 options (text + isCorrect radio), explanation, category, level
-- [ ] Zod validation on submit
-
-#### Bulk Upload (`src/pages/contributor/components/bulk-upload.tsx`)
-- [ ] Accept `.json` (QuizContent format) or `.csv`
-- [ ] Client-side parse + Zod validation before submission
-- [ ] Inline error display per question
+#### Contributor
+- [x] `/contributor` layout route with role guard
+- [x] `/contributor/submissions` — list (all rows clickable, draft→edit, others→detail)
+- [x] `/contributor/submissions/new` — form with question editor + bulk JSON upload
+- [x] `/contributor/submissions/$id/edit` — edit draft
+- [x] `/contributor/submissions/$id` — read-only detail with review feedback
+- [x] Toast on successful submission for review
 
 #### API Routes
-- [ ] `GET /api/quiz-bank` — list published quizzes
-- [ ] `GET /api/admin/submissions` — list all with status filter
-- [ ] `GET /api/admin/submissions/$id` — detail
-- [ ] `POST /api/admin/submissions/$id/approve` — copy questions→quiz_bank
-- [ ] `POST /api/admin/submissions/$id/reject` — set rejected + review_note
-- [ ] `POST /api/contributor/submissions` — create draft/pending
-- [ ] `PUT /api/contributor/submissions/$id` — update draft
-- [ ] `GET /api/contributor/submissions` — list own
-- [ ] `POST /api/contributor/submissions/$id/submit` — draft→pending_review
+- [x] Admin: list (with JOIN), detail (double JOIN), approve (transaction), reject
+- [x] Contributor: CRUD, submit for review
+- [x] Privacy: `reviewer_id` excluded from contributor responses
 
-#### Navigation
-- [ ] Add `/admin`, `/contributor`, `/games` to `TOPBAR_PREFIXES` in `__root.tsx`
-- [ ] Conditionally show admin/contributor nav items based on `users.role`
-- [ ] Update `dashboard-nav-items.ts`
+#### Code Quality (via /simplify)
+- [x] Shared `SubmissionQuestionsList` component (no duplicate JSX)
+- [x] `jsonb_array_length()` in SQL (no full JSONB transfer for lists)
+- [x] Cache invalidation on save via `useQueryClient`
+- [x] Hybrid DB driver: `db` (neon-http) for queries, `txDb` (neon-serverless Pool) for transactions
+
+---
+
+## Phase 2A: Quiz Sets Table + Backfill
+**Branch:** `feat/phase2-admin-contributor` (continue)
+**Status:** ⏳ Next
+
+### JLPT Written Exam Target (per level)
+
+| Level | Vocab+Kanji | Grammar | Reading | Total |
+|-------|-------------|---------|---------|-------|
+| N5    | 25          | 15      | 5       | 45    |
+| N4    | 30          | 15      | 7       | 52    |
+| N3    | 30          | 15      | 12      | 57    |
+| N2    | 30          | 15      | 20      | 65    |
+| N1    | 30          | 15      | 25      | 70    |
+
+### Checklist
+
+#### Schema (`src/db/schema.ts`)
+- [ ] New table: `quiz_sets` (id, slug UNIQUE, title, description, level, set_type `'category'|'exam'`, categories JSONB, author_id FK, submission_id FK, is_published, created_at, updated_at)
+- [ ] Add `quiz_set_id UUID FK` to `quiz_bank` (nullable for backfill)
+- [ ] Export types: `QuizSet`, `NewQuizSet`
+
+#### Config (`src/config/jlpt-exam-config.ts`)
+- [ ] `JLPT_EXAM_CONFIG` — question count targets per level per category
+
+#### Validators (`src/db/validators.ts`)
+- [ ] Add `QuizSetCreateSchema`
+- [ ] Raise `QuizSubmitSchema` limits: score max 20→100, total_questions max 20→100
+
+#### Migration + Backfill
+- [ ] `drizzle-kit generate` + apply via Neon MCP
+- [ ] Backfill script: create `quiz_sets` rows from existing distinct `quiz_bank.slug` values, set `quiz_set_id`
 
 ### Verification
+- [ ] All 17 existing quizzes have `quiz_sets` rows
+- [ ] `quiz_bank.quiz_set_id` populated for all rows
 - [ ] `npm run build` passes
-- [ ] Admin can list, approve, and reject submissions
-- [ ] Contributor can create, edit, and submit quizzes for review
-- [ ] Bulk JSON upload validates and creates submission
-- [ ] Approved submission questions appear in `quiz_bank`
+
+---
+
+## Phase 2B: Quiz Sets API Layer
+**Status:** ⏳ After 2A
+
+### Checklist
+- [ ] `GET /api/quiz-sets` — catalog listing with level/type filters, `isNew` flag (14 days), completedSlugs
+- [ ] `GET /api/quiz-sets/$slug` — set detail with all questions + metadata
+- [ ] `GET /api/quiz-sets/generate?level=n5` — on-the-fly exam assembly from pool matching JLPT distribution
+- [ ] Update approve endpoint: auto-create `quiz_sets` row on approval, link `quiz_bank` entries
+- [ ] Update `use-quiz.ts` to fetch from `/api/quiz-sets/$slug`
+
+### Verification
+- [ ] `GET /api/quiz-sets` returns all published sets with metadata
+- [ ] `GET /api/quiz-sets/generate?level=n5` returns random exam matching distribution
+- [ ] Approved submission auto-creates quiz set, appears in catalog API
+- [ ] Existing `/quizzes/$slug` route still works
+
+---
+
+## Phase 2C: Quiz Catalog Page
+**Status:** ⏳ After 2B
+
+### Checklist
+- [ ] `/quizzes` index route — catalog page
+- [ ] Level tabs (Kana | N5 | N4 | N3 | N2 | N1), default to assessed level
+- [ ] "Simulasi Ujian JLPT" section — exam-type set cards (prominent)
+- [ ] "Latihan per Kategori" section — category practice set cards (grid)
+- [ ] Quiz set card: title, question count, category badges, `BadgeWithDot` "Baru", completion status, best score
+- [ ] "Buat Simulasi Ujian" button → generate random exam → navigate to quiz
+- [ ] Show "Segera Hadir" for levels with insufficient question pool
+- [ ] Add "Kuis" nav item to `dashboard-nav-items.ts`
+- [ ] Add "Kembali ke Katalog" button on quiz score results page
+
+### Verification
+- [ ] `/quizzes` shows level tabs with quiz set cards
+- [ ] "Baru" badge shows for sets created within 14 days
+- [ ] Can take a quiz from catalog and return to catalog after
+- [ ] `npm run build` passes
+
+---
+
+## Phase 2D: Contributor Form + Learning Path Polish
+**Status:** ⏳ After 2C
+
+### Checklist
+- [ ] Add JLPT question count guidance text on submission form (informational)
+- [ ] Remove hardcoded `LEVEL_QUIZ_SLUGS` from `step-detail-page.tsx`
+- [ ] Add "Lihat Katalog Kuis" CTA on section quiz card and step detail
+
+### Verification
+- [ ] Contributor sees recommended question counts when creating submission
+- [ ] Learning path still shows quiz cards
+- [ ] Quiz catalog link accessible from learning path
 
 ---
 
 ## Phase 3: Remove Static Quiz Files
 **Branch:** `feat/phase3-remove-static-quizzes`
-**Status:** ⏳ Pending Phase 2
+**Status:** ⏳ After Phase 2D
 
 ### Checklist
 - [ ] All 17 quizzes verified loading from DB
-- [ ] Remove `QUIZ_LOADERS` map from `use-quiz.ts`
 - [ ] Delete `src/content/quizzes/` directory (all 17 `.ts` files)
 - [ ] Remove any remaining static quiz import references
 - [ ] `npm run build` passes
-
-### Verification
-- [ ] No references to `src/content/quizzes/` remain in codebase
-- [ ] All existing quiz routes still work end-to-end
 
 ---
 
 ## Phase 4: Mini-Games
 **Branch:** `feat/phase4-mini-games`
-**Status:** ⏳ Pending Phase 3
+**Status:** ⏳ After Phase 3
 
 ### Checklist
 
-#### Game Store (`src/stores/game-store.ts`)
-- [ ] Mirrors `quiz-store.ts` pattern: init → play → submit → reset
-- [ ] Tracks: gameType, level, items, score, maxScore, startTime, isComplete, isSubmitting
-
-#### Routes
+#### Game Store + Routes
+- [ ] `src/stores/game-store.ts` — mirrors quiz-store pattern
 - [ ] `/games/$level` — game selection hub
-- [ ] `/games/$level/flashcard-match` — flashcard matching game
-- [ ] `/games/$level/word-sort` — drag-and-drop word sorting
-
-#### Flashcard Match (`src/pages/games/flashcard-match-page.tsx`)
-- [ ] Grid of face-down cards (JP↔ID pairs)
-- [ ] Framer Motion `rotateY` flip animation
-- [ ] 6-8 pairs per round (3-column grid for 375px)
-- [ ] Score = matched pairs, time tracked
-- [ ] Results screen with XP award
-
-#### Word Sort (`src/pages/games/word-sort-page.tsx`)
-- [ ] Scrambled words dragged into category drop zones
-- [ ] Framer Motion `drag` + `Reorder` (no new deps)
-- [ ] Score = correctly sorted words, time tracked
-- [ ] Results screen with XP award
+- [ ] `/games/$level/flashcard-match` — card matching game
+- [ ] `/games/$level/word-sort` — drag-and-drop sorting
 
 #### Components
-- [ ] `game-timer.tsx` — shared countdown/elapsed timer
-- [ ] `game-score-display.tsx` — shared results/score screen
-- [ ] `flashcard.tsx` — single flippable card
-- [ ] `sortable-word.tsx` — draggable word chip
-- [ ] `drop-zone.tsx` — drop target zone
+- [ ] `game-timer.tsx`, `game-score-display.tsx`, `flashcard.tsx`, `sortable-word.tsx`, `drop-zone.tsx`
 
-#### API Routes
-- [ ] `POST /api/games/submit` — save game result + award XP
-- [ ] `GET /api/games/$level/history` — user's game history for a level
+#### API
+- [ ] `POST /api/games/submit` — save result + XP
+- [ ] `GET /api/games/$level/history` — game history
 
 ### Verification
-- [ ] Navigate to `/games/n5` → see game selection
-- [ ] Complete flashcard match → score saved → XP awarded
-- [ ] Complete word sort → score saved → XP awarded
-- [ ] Game history visible
+- [ ] Both games playable with score saving and XP awards
 - [ ] `npm run build` passes
 
 ---
@@ -183,6 +202,7 @@ Migrating quiz content from static TypeScript files to a DB-backed system with c
 ## Notes
 - All UI uses Untitled UI components only (no custom visual components)
 - Kebab-case filenames throughout
-- Semantic color tokens only (`text-primary`, `bg-brand-solid`, etc.)
+- Semantic color tokens only
 - Mobile-first, 375px primary viewport
 - Indonesian language primary
+- Hybrid DB: `db` (neon-http) for queries, `txDb` (neon-serverless) for transactions

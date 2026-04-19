@@ -114,20 +114,29 @@ export function QuizPage() {
               </p>
             )}
 
-            <div className="flex flex-col md:flex-row gap-3 w-full mt-4">
+            <div className="flex flex-col gap-3 w-full mt-4">
+              <div className="flex flex-col md:flex-row gap-3 w-full">
+                <Button
+                  color="secondary"
+                  className="w-full md:w-auto"
+                  onClick={() => reset()}
+                >
+                  Coba Lagi
+                </Button>
+                <Button
+                  color="primary"
+                  className="w-full md:w-auto"
+                  onClick={() => void navigate({ to: '/' })}
+                >
+                  Lanjut ke Step Berikutnya
+                </Button>
+              </div>
               <Button
-                color="secondary"
-                className="w-full md:w-auto"
-                onClick={() => reset()}
+                color="tertiary"
+                className="w-full"
+                onClick={() => void navigate({ to: '/quizzes' })}
               >
-                Coba Lagi
-              </Button>
-              <Button
-                color="primary"
-                className="w-full md:w-auto"
-                onClick={() => void navigate({ to: '/' })}
-              >
-                Lanjut ke Step Berikutnya
+                Kembali ke Katalog Kuis
               </Button>
             </div>
           </motion.div>

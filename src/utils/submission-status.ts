@@ -30,3 +30,8 @@ export function formatSubmissionDate(date: Date | string | null): string {
   if (!date) return '-';
   return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium' }).format(new Date(date));
 }
+
+/** Returns the JLPT level string from an exam slug (`exam-n5` → `'n5'`), or null if not an exam slug. */
+export function getExamLevel(slug: string): string | null {
+  return slug.startsWith('exam-') ? slug.slice(5) : null;
+}

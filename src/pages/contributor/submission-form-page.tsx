@@ -7,6 +7,7 @@ import type { QuizQuestionInput } from '@/db/validators';
 import { QuizSubmissionCreateSchema } from '@/db/validators';
 import { Button } from '@/components/base/buttons/button';
 import { Input } from '@/components/base/input/input';
+import { TextArea } from '@/components/base/textarea/textarea';
 import { NativeSelect } from '@/components/base/select/select-native';
 import { LEVEL_LABELS, LEVEL_ORDER } from '@/content/levels';
 import { CATEGORY_LABELS } from '@/utils/submission-status';
@@ -54,6 +55,7 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [slugTouched, setSlugTouched] = useState(false);
+  const [description, setDescription] = useState('');
   const [level, setLevel] = useState('n5');
   const [category, setCategory] = useState('vocab');
   const [questions, setQuestions] = useState<QuizQuestionInput[]>([]);
@@ -80,6 +82,7 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
     setTitle(existing.title);
     setSlug(existing.slug);
     setSlugTouched(true);
+    setDescription(existing.description ?? '');
     setLevel(existing.level);
     setCategory(existing.category);
     setQuestions(existing.questions as QuizQuestionInput[]);
@@ -112,7 +115,7 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, title, level, category, questions }),
+        body: JSON.stringify({ slug, title, description: description || undefined, level, category, questions }),
       });
       if (!res.ok) {
         const err = await res.json() as { error?: string };
@@ -141,7 +144,7 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
   });
 
   const validate = () => {
-    const result = QuizSubmissionCreateSchema.safeParse({ slug, title, level, category, questions });
+    const result = QuizSubmissionCreateSchema.safeParse({ slug, title, description: description || undefined, level, category, questions });
     if (!result.success) {
       const firstError = result.error.issues[0];
       setValidationError(`${firstError.path.join('.')}: ${firstError.message}`);
@@ -216,6 +219,17 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
             setSlug(v);
           }}
           hint="Identifikasi unik URL. Auto-diisi dari judul."
+        />
+
+        <TextArea
+          label="Deskripsi (opsional)"
+          placeholder="Jelaskan secara singkat isi kuis ini..."
+          rows={3}
+          maxLength={500}
+          value={description}
+          onChange={setDescription}
+          hint={`${description.length}/500`}
+          size="sm"
         />
 
         <div className="grid grid-cols-2 gap-4">

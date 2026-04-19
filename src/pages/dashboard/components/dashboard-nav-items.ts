@@ -1,10 +1,11 @@
-import { Home01, BookOpen02, Trophy01, RefreshCw05, LetterSpacing01, CheckSquare, Edit05 } from '@untitledui/icons';
+import { Home01, BookOpen02, Trophy01, RefreshCw05, LetterSpacing01, CheckSquare, Edit05, GraduationHat01 } from '@untitledui/icons';
 import type { NavItemType } from '@/components/application/app-navigation/config';
 
 export const dashboardNavItems: NavItemType[] = [
   { label: 'Belajar',       href: '/',         icon: Home01 },
   { label: 'Jalur Belajar', href: '/learning', icon: BookOpen02 },
   { label: 'Huruf',         href: '/letters',  icon: LetterSpacing01 },
+  { label: 'Kuis',          href: '/quizzes',  icon: GraduationHat01 },
   { label: 'Pencapaian',    href: '/profile',  icon: Trophy01 },
 ];
 
