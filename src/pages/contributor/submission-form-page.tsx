@@ -191,7 +191,7 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
   const isBusy = saveMutation.isPending || submitForReviewMutation.isPending;
 
   const jlptTarget = JLPT_EXAM_CONFIG[level]?.[category as QuizQuestionInput['category']];
-  const jlptHint = jlptTarget === undefined ? (
+  const jlptHint = jlptTarget === undefined || jlptTarget === 0 ? (
     <p className="text-xs text-tertiary">Kanji termasuk dalam bagian Kosakata di ujian JLPT resmi.</p>
   ) : (
     <p className="text-xs text-tertiary">
