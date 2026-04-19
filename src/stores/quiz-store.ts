@@ -2,6 +2,15 @@ import { create } from 'zustand';
 import type { QuizQuestion, QuizScoreResult } from '@/types/quiz';
 import { calculateQuizScore } from '@/types/quiz';
 
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 type QuizStore = {
   quizSlug: string | null;
   questions: QuizQuestion[];
@@ -37,14 +46,21 @@ export const useQuizStore = create<QuizStore>((set, get) => ({
       : null;
     if (saved) {
       try {
-        const parsed = JSON.parse(saved) as { currentQuestion: number; answers: Record<string, string> };
-        // Clamp restored index in case question count changed since session was saved
-        const safeIndex = Math.min(Math.max(0, parsed.currentQuestion), Math.max(0, questions.length - 1));
-        set({ quizSlug: slug, questions, currentQuestion: safeIndex, answers: parsed.answers, showFeedback: false, lastAnswerCorrect: null, scoreResult: null, submitError: null });
-        return;
+        const parsed = JSON.parse(saved) as { currentQuestion: number; answers: Record<string, string>; questions?: QuizQuestion[] };
+        // Restore the previously shuffled order so saved answer IDs still point to the right options
+        if (parsed.questions?.length) {
+          const safeIndex = Math.min(Math.max(0, parsed.currentQuestion), parsed.questions.length - 1);
+          set({ quizSlug: slug, questions: parsed.questions, currentQuestion: safeIndex, answers: parsed.answers, showFeedback: false, lastAnswerCorrect: null, scoreResult: null, submitError: null });
+          return;
+        }
       } catch { /* ignore malformed session */ }
     }
-    set({ quizSlug: slug, questions, currentQuestion: 0, answers: {}, showFeedback: false, lastAnswerCorrect: null, scoreResult: null, submitError: null });
+    // Fresh start — shuffle question order and option order
+    const shuffled = shuffleArray(questions).map((q) => ({
+      ...q,
+      options: shuffleArray(q.options),
+    }));
+    set({ quizSlug: slug, questions: shuffled, currentQuestion: 0, answers: {}, showFeedback: false, lastAnswerCorrect: null, scoreResult: null, submitError: null });
   },
 
   setAnswer: (questionId, optionId, correct) => {
@@ -53,7 +69,7 @@ export const useQuizStore = create<QuizStore>((set, get) => ({
       if (typeof window !== 'undefined') {
         sessionStorage.setItem(
           `quiz_session_${state.quizSlug}`,
-          JSON.stringify({ currentQuestion: state.currentQuestion, answers })
+          JSON.stringify({ currentQuestion: state.currentQuestion, answers, questions: state.questions })
         );
       }
       return { answers, showFeedback: true, lastAnswerCorrect: correct };

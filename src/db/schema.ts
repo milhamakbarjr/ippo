@@ -149,30 +149,6 @@ export const ba_verification = pgTable('ba_verification', {
   updatedAt:  timestamp('updated_at').defaultNow(),
 });
 
-// ─── Quiz Bank ────────────────────────────────────────────────────────────────
-
-export const quiz_bank = pgTable(
-  'quiz_bank',
-  {
-    id:            uuid('id').primaryKey().defaultRandom(),
-    slug:          varchar('slug', { length: 255 }).notNull(),
-    title:         varchar('title', { length: 255 }).notNull(),
-    question_id:   varchar('question_id', { length: 100 }).notNull().unique(),
-    question_text: text('question_text').notNull(),
-    options:       jsonb('options').notNull(),
-    explanation:   text('explanation').notNull(),
-    category:      varchar('category', { length: 20 }).notNull(),
-    level:         varchar('level', { length: 10 }).notNull(),
-    sort_order:    integer('sort_order').default(0).notNull(),
-    created_at:    timestamp('created_at').defaultNow(),
-    updated_at:    timestamp('updated_at').defaultNow(),
-  },
-  (table) => [
-    index('idx_quiz_bank_slug').on(table.slug),
-    index('idx_quiz_bank_level_cat').on(table.level, table.category),
-  ],
-);
-
 // ─── Quiz Submissions ─────────────────────────────────────────────────────────
 
 export const quiz_submissions = pgTable(
@@ -182,6 +158,7 @@ export const quiz_submissions = pgTable(
     submitted_by: uuid('submitted_by').notNull().references(() => users.id, { onDelete: 'cascade' }),
     slug:         varchar('slug', { length: 255 }).notNull(),
     title:        varchar('title', { length: 255 }).notNull(),
+    description:  text('description'),
     level:        varchar('level', { length: 10 }).notNull(),
     category:     varchar('category', { length: 20 }).notNull(),
     questions:    jsonb('questions').notNull(),
@@ -196,6 +173,59 @@ export const quiz_submissions = pgTable(
   (table) => [
     index('idx_submissions_status').on(table.status),
     index('idx_submissions_user').on(table.submitted_by),
+  ],
+);
+
+// ─── Quiz Sets ────────────────────────────────────────────────────────────────
+// Declared after quiz_submissions so the submission_id FK resolves correctly.
+
+export const quiz_sets = pgTable(
+  'quiz_sets',
+  {
+    id:            uuid('id').primaryKey().defaultRandom(),
+    slug:          varchar('slug', { length: 255 }).notNull().unique(),
+    title:         varchar('title', { length: 255 }).notNull(),
+    description:   text('description'),
+    level:         varchar('level', { length: 10 }).notNull(),
+    // 'category' = single-category practice; 'exam' = full JLPT-format mixed set
+    set_type:      varchar('set_type', { length: 20 }).default('category').notNull(),
+    // e.g. ['vocab'] or ['vocab','kanji','grammar','reading']
+    categories:    jsonb('categories').default([]).notNull(),
+    author_id:     uuid('author_id').references(() => users.id, { onDelete: 'set null' }),
+    submission_id: uuid('submission_id').references(() => quiz_submissions.id, { onDelete: 'set null' }),
+    is_published:  boolean('is_published').default(true).notNull(),
+    created_at:    timestamp('created_at').defaultNow(),
+    updated_at:    timestamp('updated_at').defaultNow(),
+  },
+  (table) => [
+    index('idx_quiz_sets_level').on(table.level),
+    index('idx_quiz_sets_level_type').on(table.level, table.set_type),
+  ],
+);
+
+// ─── Quiz Bank ────────────────────────────────────────────────────────────────
+
+export const quiz_bank = pgTable(
+  'quiz_bank',
+  {
+    id:            uuid('id').primaryKey().defaultRandom(),
+    quiz_set_id:   uuid('quiz_set_id').references(() => quiz_sets.id, { onDelete: 'set null' }),
+    slug:          varchar('slug', { length: 255 }).notNull(),
+    title:         varchar('title', { length: 255 }).notNull(),
+    question_id:   varchar('question_id', { length: 100 }).notNull().unique(),
+    question_text: text('question_text').notNull(),
+    options:       jsonb('options').notNull(),
+    explanation:   text('explanation').notNull(),
+    category:      varchar('category', { length: 20 }).notNull(),
+    level:         varchar('level', { length: 10 }).notNull(),
+    sort_order:    integer('sort_order').default(0).notNull(),
+    created_at:    timestamp('created_at').defaultNow(),
+    updated_at:    timestamp('updated_at').defaultNow(),
+  },
+  (table) => [
+    index('idx_quiz_bank_slug').on(table.slug),
+    index('idx_quiz_bank_quiz_set').on(table.quiz_set_id),
+    index('idx_quiz_bank_level_cat').on(table.level, table.category),
   ],
 );
 
@@ -236,9 +266,11 @@ export type NewAchievement = typeof achievements.$inferInsert;
 export type OtpCode    = typeof otp_codes.$inferSelect;
 export type NewOtpCode = typeof otp_codes.$inferInsert;
 
-export type QuizBankEntry    = typeof quiz_bank.$inferSelect;
-export type NewQuizBankEntry = typeof quiz_bank.$inferInsert;
 export type QuizSubmission    = typeof quiz_submissions.$inferSelect;
 export type NewQuizSubmission = typeof quiz_submissions.$inferInsert;
+export type QuizSet           = typeof quiz_sets.$inferSelect;
+export type NewQuizSet        = typeof quiz_sets.$inferInsert;
+export type QuizBankEntry     = typeof quiz_bank.$inferSelect;
+export type NewQuizBankEntry  = typeof quiz_bank.$inferInsert;
 export type GameResult        = typeof game_results.$inferSelect;
 export type NewGameResult     = typeof game_results.$inferInsert;

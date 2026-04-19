@@ -15,6 +15,7 @@ import { Route as LettersRouteImport } from './routes/letters'
 import { Route as ContributorRouteImport } from './routes/contributor'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as QuizzesIndexRouteImport } from './routes/quizzes/index'
 import { Route as LettersIndexRouteImport } from './routes/letters/index'
 import { Route as LearningIndexRouteImport } from './routes/learning/index'
 import { Route as QuizzesSlugRouteImport } from './routes/quizzes/$slug'
@@ -27,6 +28,7 @@ import { Route as ApiAchievementsRouteImport } from './routes/api/achievements'
 import { Route as AdminSubmissionsRouteImport } from './routes/admin/submissions'
 import { Route as LearningLevelIndexRouteImport } from './routes/learning/$level.index'
 import { Route as ContributorSubmissionsIndexRouteImport } from './routes/contributor/submissions.index'
+import { Route as ApiQuizSetsIndexRouteImport } from './routes/api/quiz-sets/index'
 import { Route as ApiQuizBankIndexRouteImport } from './routes/api/quiz-bank/index'
 import { Route as AdminSubmissionsIndexRouteImport } from './routes/admin/submissions.index'
 import { Route as LettersTipsTypeRouteImport } from './routes/letters/tips.$type'
@@ -34,6 +36,9 @@ import { Route as LearningLevelStepSlugRouteImport } from './routes/learning/$le
 import { Route as ContributorSubmissionsNewRouteImport } from './routes/contributor/submissions.new'
 import { Route as ContributorSubmissionsIdRouteImport } from './routes/contributor/submissions.$id'
 import { Route as ApiQuizSubmitRouteImport } from './routes/api/quiz/submit'
+import { Route as ApiQuizSetsPoolStatsRouteImport } from './routes/api/quiz-sets/pool-stats'
+import { Route as ApiQuizSetsGenerateRouteImport } from './routes/api/quiz-sets/generate'
+import { Route as ApiQuizSetsSlugRouteImport } from './routes/api/quiz-sets/$slug'
 import { Route as ApiQuizBankSlugRouteImport } from './routes/api/quiz-bank/$slug'
 import { Route as ApiProgressCompleteRouteImport } from './routes/api/progress/complete'
 import { Route as ApiProgressLevelRouteImport } from './routes/api/progress/$level'
@@ -88,6 +93,11 @@ const AdminRoute = AdminRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizzesIndexRoute = QuizzesIndexRouteImport.update({
+  id: '/quizzes/',
+  path: '/quizzes/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LettersIndexRoute = LettersIndexRouteImport.update({
@@ -151,6 +161,11 @@ const ContributorSubmissionsIndexRoute =
     path: '/',
     getParentRoute: () => ContributorSubmissionsRoute,
   } as any)
+const ApiQuizSetsIndexRoute = ApiQuizSetsIndexRouteImport.update({
+  id: '/api/quiz-sets/',
+  path: '/api/quiz-sets/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiQuizBankIndexRoute = ApiQuizBankIndexRouteImport.update({
   id: '/api/quiz-bank/',
   path: '/api/quiz-bank/',
@@ -186,6 +201,21 @@ const ContributorSubmissionsIdRoute =
 const ApiQuizSubmitRoute = ApiQuizSubmitRouteImport.update({
   id: '/api/quiz/submit',
   path: '/api/quiz/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiQuizSetsPoolStatsRoute = ApiQuizSetsPoolStatsRouteImport.update({
+  id: '/api/quiz-sets/pool-stats',
+  path: '/api/quiz-sets/pool-stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiQuizSetsGenerateRoute = ApiQuizSetsGenerateRouteImport.update({
+  id: '/api/quiz-sets/generate',
+  path: '/api/quiz-sets/generate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiQuizSetsSlugRoute = ApiQuizSetsSlugRouteImport.update({
+  id: '/api/quiz-sets/$slug',
+  path: '/api/quiz-sets/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiQuizBankSlugRoute = ApiQuizBankSlugRouteImport.update({
@@ -342,6 +372,7 @@ export interface FileRoutesByFullPath {
   '/quizzes/$slug': typeof QuizzesSlugRoute
   '/learning/': typeof LearningIndexRoute
   '/letters/': typeof LettersIndexRoute
+  '/quizzes/': typeof QuizzesIndexRoute
   '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -352,6 +383,9 @@ export interface FileRoutesByFullPath {
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/api/quiz-bank/$slug': typeof ApiQuizBankSlugRoute
+  '/api/quiz-sets/$slug': typeof ApiQuizSetsSlugRoute
+  '/api/quiz-sets/generate': typeof ApiQuizSetsGenerateRoute
+  '/api/quiz-sets/pool-stats': typeof ApiQuizSetsPoolStatsRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/contributor/submissions/$id': typeof ContributorSubmissionsIdRouteWithChildren
   '/contributor/submissions/new': typeof ContributorSubmissionsNewRoute
@@ -359,6 +393,7 @@ export interface FileRoutesByFullPath {
   '/letters/tips/$type': typeof LettersTipsTypeRouteWithChildren
   '/admin/submissions/': typeof AdminSubmissionsIndexRoute
   '/api/quiz-bank/': typeof ApiQuizBankIndexRoute
+  '/api/quiz-sets/': typeof ApiQuizSetsIndexRoute
   '/contributor/submissions/': typeof ContributorSubmissionsIndexRoute
   '/learning/$level/': typeof LearningLevelIndexRoute
   '/api/admin/submissions/$id': typeof ApiAdminSubmissionsIdRouteWithChildren
@@ -390,6 +425,7 @@ export interface FileRoutesByTo {
   '/quizzes/$slug': typeof QuizzesSlugRoute
   '/learning': typeof LearningIndexRoute
   '/letters': typeof LettersIndexRoute
+  '/quizzes': typeof QuizzesIndexRoute
   '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -400,11 +436,15 @@ export interface FileRoutesByTo {
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/api/quiz-bank/$slug': typeof ApiQuizBankSlugRoute
+  '/api/quiz-sets/$slug': typeof ApiQuizSetsSlugRoute
+  '/api/quiz-sets/generate': typeof ApiQuizSetsGenerateRoute
+  '/api/quiz-sets/pool-stats': typeof ApiQuizSetsPoolStatsRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/contributor/submissions/new': typeof ContributorSubmissionsNewRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
   '/admin/submissions': typeof AdminSubmissionsIndexRoute
   '/api/quiz-bank': typeof ApiQuizBankIndexRoute
+  '/api/quiz-sets': typeof ApiQuizSetsIndexRoute
   '/contributor/submissions': typeof ContributorSubmissionsIndexRoute
   '/learning/$level': typeof LearningLevelIndexRoute
   '/api/admin/submissions/$id': typeof ApiAdminSubmissionsIdRouteWithChildren
@@ -441,6 +481,7 @@ export interface FileRoutesById {
   '/quizzes/$slug': typeof QuizzesSlugRoute
   '/learning/': typeof LearningIndexRoute
   '/letters/': typeof LettersIndexRoute
+  '/quizzes/': typeof QuizzesIndexRoute
   '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
   '/api/assessment/submit': typeof ApiAssessmentSubmitRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -451,6 +492,9 @@ export interface FileRoutesById {
   '/api/progress/$level': typeof ApiProgressLevelRoute
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/api/quiz-bank/$slug': typeof ApiQuizBankSlugRoute
+  '/api/quiz-sets/$slug': typeof ApiQuizSetsSlugRoute
+  '/api/quiz-sets/generate': typeof ApiQuizSetsGenerateRoute
+  '/api/quiz-sets/pool-stats': typeof ApiQuizSetsPoolStatsRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/contributor/submissions/$id': typeof ContributorSubmissionsIdRouteWithChildren
   '/contributor/submissions/new': typeof ContributorSubmissionsNewRoute
@@ -458,6 +502,7 @@ export interface FileRoutesById {
   '/letters/tips/$type': typeof LettersTipsTypeRouteWithChildren
   '/admin/submissions/': typeof AdminSubmissionsIndexRoute
   '/api/quiz-bank/': typeof ApiQuizBankIndexRoute
+  '/api/quiz-sets/': typeof ApiQuizSetsIndexRoute
   '/contributor/submissions/': typeof ContributorSubmissionsIndexRoute
   '/learning/$level/': typeof LearningLevelIndexRoute
   '/api/admin/submissions/$id': typeof ApiAdminSubmissionsIdRouteWithChildren
@@ -495,6 +540,7 @@ export interface FileRouteTypes {
     | '/quizzes/$slug'
     | '/learning/'
     | '/letters/'
+    | '/quizzes/'
     | '/admin/submissions/$id'
     | '/api/assessment/submit'
     | '/api/auth/$'
@@ -505,6 +551,9 @@ export interface FileRouteTypes {
     | '/api/progress/$level'
     | '/api/progress/complete'
     | '/api/quiz-bank/$slug'
+    | '/api/quiz-sets/$slug'
+    | '/api/quiz-sets/generate'
+    | '/api/quiz-sets/pool-stats'
     | '/api/quiz/submit'
     | '/contributor/submissions/$id'
     | '/contributor/submissions/new'
@@ -512,6 +561,7 @@ export interface FileRouteTypes {
     | '/letters/tips/$type'
     | '/admin/submissions/'
     | '/api/quiz-bank/'
+    | '/api/quiz-sets/'
     | '/contributor/submissions/'
     | '/learning/$level/'
     | '/api/admin/submissions/$id'
@@ -543,6 +593,7 @@ export interface FileRouteTypes {
     | '/quizzes/$slug'
     | '/learning'
     | '/letters'
+    | '/quizzes'
     | '/admin/submissions/$id'
     | '/api/assessment/submit'
     | '/api/auth/$'
@@ -553,11 +604,15 @@ export interface FileRouteTypes {
     | '/api/progress/$level'
     | '/api/progress/complete'
     | '/api/quiz-bank/$slug'
+    | '/api/quiz-sets/$slug'
+    | '/api/quiz-sets/generate'
+    | '/api/quiz-sets/pool-stats'
     | '/api/quiz/submit'
     | '/contributor/submissions/new'
     | '/learning/$level/$stepSlug'
     | '/admin/submissions'
     | '/api/quiz-bank'
+    | '/api/quiz-sets'
     | '/contributor/submissions'
     | '/learning/$level'
     | '/api/admin/submissions/$id'
@@ -593,6 +648,7 @@ export interface FileRouteTypes {
     | '/quizzes/$slug'
     | '/learning/'
     | '/letters/'
+    | '/quizzes/'
     | '/admin/submissions/$id'
     | '/api/assessment/submit'
     | '/api/auth/$'
@@ -603,6 +659,9 @@ export interface FileRouteTypes {
     | '/api/progress/$level'
     | '/api/progress/complete'
     | '/api/quiz-bank/$slug'
+    | '/api/quiz-sets/$slug'
+    | '/api/quiz-sets/generate'
+    | '/api/quiz-sets/pool-stats'
     | '/api/quiz/submit'
     | '/contributor/submissions/$id'
     | '/contributor/submissions/new'
@@ -610,6 +669,7 @@ export interface FileRouteTypes {
     | '/letters/tips/$type'
     | '/admin/submissions/'
     | '/api/quiz-bank/'
+    | '/api/quiz-sets/'
     | '/contributor/submissions/'
     | '/learning/$level/'
     | '/api/admin/submissions/$id'
@@ -643,6 +703,7 @@ export interface RootRouteChildren {
   LearningLevelRoute: typeof LearningLevelRouteWithChildren
   QuizzesSlugRoute: typeof QuizzesSlugRoute
   LearningIndexRoute: typeof LearningIndexRoute
+  QuizzesIndexRoute: typeof QuizzesIndexRoute
   ApiAssessmentSubmitRoute: typeof ApiAssessmentSubmitRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
@@ -652,8 +713,12 @@ export interface RootRouteChildren {
   ApiProgressLevelRoute: typeof ApiProgressLevelRoute
   ApiProgressCompleteRoute: typeof ApiProgressCompleteRoute
   ApiQuizBankSlugRoute: typeof ApiQuizBankSlugRoute
+  ApiQuizSetsSlugRoute: typeof ApiQuizSetsSlugRoute
+  ApiQuizSetsGenerateRoute: typeof ApiQuizSetsGenerateRoute
+  ApiQuizSetsPoolStatsRoute: typeof ApiQuizSetsPoolStatsRoute
   ApiQuizSubmitRoute: typeof ApiQuizSubmitRoute
   ApiQuizBankIndexRoute: typeof ApiQuizBankIndexRoute
+  ApiQuizSetsIndexRoute: typeof ApiQuizSetsIndexRoute
   ApiAdminSubmissionsIdRoute: typeof ApiAdminSubmissionsIdRouteWithChildren
   ApiLearningLevelProgressRoute: typeof ApiLearningLevelProgressRoute
   ApiQuizSlugHistoryRoute: typeof ApiQuizSlugHistoryRoute
@@ -705,6 +770,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quizzes/': {
+      id: '/quizzes/'
+      path: '/quizzes'
+      fullPath: '/quizzes/'
+      preLoaderRoute: typeof QuizzesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/letters/': {
@@ -791,6 +863,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContributorSubmissionsIndexRouteImport
       parentRoute: typeof ContributorSubmissionsRoute
     }
+    '/api/quiz-sets/': {
+      id: '/api/quiz-sets/'
+      path: '/api/quiz-sets'
+      fullPath: '/api/quiz-sets/'
+      preLoaderRoute: typeof ApiQuizSetsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/quiz-bank/': {
       id: '/api/quiz-bank/'
       path: '/api/quiz-bank'
@@ -838,6 +917,27 @@ declare module '@tanstack/react-router' {
       path: '/api/quiz/submit'
       fullPath: '/api/quiz/submit'
       preLoaderRoute: typeof ApiQuizSubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/quiz-sets/pool-stats': {
+      id: '/api/quiz-sets/pool-stats'
+      path: '/api/quiz-sets/pool-stats'
+      fullPath: '/api/quiz-sets/pool-stats'
+      preLoaderRoute: typeof ApiQuizSetsPoolStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/quiz-sets/generate': {
+      id: '/api/quiz-sets/generate'
+      path: '/api/quiz-sets/generate'
+      fullPath: '/api/quiz-sets/generate'
+      preLoaderRoute: typeof ApiQuizSetsGenerateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/quiz-sets/$slug': {
+      id: '/api/quiz-sets/$slug'
+      path: '/api/quiz-sets/$slug'
+      fullPath: '/api/quiz-sets/$slug'
+      preLoaderRoute: typeof ApiQuizSetsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/quiz-bank/$slug': {
@@ -1163,6 +1263,7 @@ const rootRouteChildren: RootRouteChildren = {
   LearningLevelRoute: LearningLevelRouteWithChildren,
   QuizzesSlugRoute: QuizzesSlugRoute,
   LearningIndexRoute: LearningIndexRoute,
+  QuizzesIndexRoute: QuizzesIndexRoute,
   ApiAssessmentSubmitRoute: ApiAssessmentSubmitRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthLogoutRoute: ApiAuthLogoutRoute,
@@ -1172,8 +1273,12 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProgressLevelRoute: ApiProgressLevelRoute,
   ApiProgressCompleteRoute: ApiProgressCompleteRoute,
   ApiQuizBankSlugRoute: ApiQuizBankSlugRoute,
+  ApiQuizSetsSlugRoute: ApiQuizSetsSlugRoute,
+  ApiQuizSetsGenerateRoute: ApiQuizSetsGenerateRoute,
+  ApiQuizSetsPoolStatsRoute: ApiQuizSetsPoolStatsRoute,
   ApiQuizSubmitRoute: ApiQuizSubmitRoute,
   ApiQuizBankIndexRoute: ApiQuizBankIndexRoute,
+  ApiQuizSetsIndexRoute: ApiQuizSetsIndexRoute,
   ApiAdminSubmissionsIdRoute: ApiAdminSubmissionsIdRouteWithChildren,
   ApiLearningLevelProgressRoute: ApiLearningLevelProgressRoute,
   ApiQuizSlugHistoryRoute: ApiQuizSlugHistoryRoute,

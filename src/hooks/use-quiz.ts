@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuizStore } from '@/stores/quiz-store';
 import type { QuizQuestion } from '@/types/quiz';
+import { getExamLevel } from '@/utils/submission-status';
 
 export function useQuiz(slug: string) {
   const { initQuiz, questions } = useQuizStore();
@@ -14,7 +15,13 @@ export function useQuiz(slug: string) {
     const controller = new AbortController();
     setIsLoading(true);
     setError(null);
-    fetch(`/api/quiz-bank/${slug}`, { signal: controller.signal })
+
+    const examLevel = getExamLevel(slug);
+    const url = examLevel
+      ? `/api/quiz-sets/generate?level=${examLevel}`
+      : `/api/quiz-sets/${slug}`;
+
+    fetch(url, { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error('Quiz not found');
         return res.json() as Promise<{ questions: QuizQuestion[] }>;

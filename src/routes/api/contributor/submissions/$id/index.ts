@@ -22,6 +22,7 @@ export const Route = createFileRoute('/api/contributor/submissions/$id/')({
             submitted_by: quiz_submissions.submitted_by,
             slug: quiz_submissions.slug,
             title: quiz_submissions.title,
+            description: quiz_submissions.description,
             level: quiz_submissions.level,
             category: quiz_submissions.category,
             questions: quiz_submissions.questions,
@@ -84,11 +85,11 @@ export const Route = createFileRoute('/api/contributor/submissions/$id/')({
           return Response.json({ error: parsed.error.message }, { status: 400 });
         }
 
-        const { slug, title, level, category, questions } = parsed.data;
+        const { slug, title, description, level, category, questions } = parsed.data;
 
         const [submission] = await db
           .update(quiz_submissions)
-          .set({ slug, title, level, category, questions, updated_at: new Date() })
+          .set({ slug, title, description, level, category, questions, updated_at: new Date() })
           .where(and(eq(quiz_submissions.id, params.id), eq(quiz_submissions.submitted_by, appUser.id)))
           .returning();
 

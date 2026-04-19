@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { txDb } from '@/db';
-import { quiz_submissions, quiz_bank } from '@/db/schema';
+import { quiz_submissions, quiz_bank, quiz_sets } from '@/db/schema';
 import { requireAuth, isAuthError, requireAdminRole } from '@/server/auth-guard';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
@@ -48,14 +48,41 @@ export const Route = createFileRoute('/api/admin/submissions/$id/approve')({
               sort_order:    index,
             }));
 
-            let added = 0;
+            let inserted: { id: string }[] = [];
             if (insertValues.length > 0) {
-              const inserted = await tx
+              inserted = await tx
                 .insert(quiz_bank)
                 .values(insertValues)
                 .onConflictDoNothing({ target: quiz_bank.question_id })
                 .returning({ id: quiz_bank.id });
-              added = inserted.length;
+            }
+
+            // Create or update the quiz_set for this submission
+            const [quizSet] = await tx
+              .insert(quiz_sets)
+              .values({
+                slug:          submission.slug,
+                title:         submission.title,
+                description:   submission.description ?? null,
+                level:         submission.level,
+                set_type:      'category',
+                categories:    [submission.category],
+                author_id:     submission.submitted_by,
+                submission_id: submission.id,
+                is_published:  true,
+              })
+              .onConflictDoUpdate({
+                target:  quiz_sets.slug,
+                set:     { updated_at: new Date() },
+              })
+              .returning({ id: quiz_sets.id });
+
+            // Link inserted quiz_bank rows to the quiz set
+            if (inserted.length > 0) {
+              await tx
+                .update(quiz_bank)
+                .set({ quiz_set_id: quizSet.id })
+                .where(eq(quiz_bank.slug, submission.slug));
             }
 
             const now = new Date();
@@ -64,7 +91,7 @@ export const Route = createFileRoute('/api/admin/submissions/$id/approve')({
               .set({ status: 'published', reviewer_id: appUser.id, reviewed_at: now, updated_at: now })
               .where(eq(quiz_submissions.id, id));
 
-            return added;
+            return inserted.length;
           });
         } catch (err) {
           const e = err as Error & { status?: number };
