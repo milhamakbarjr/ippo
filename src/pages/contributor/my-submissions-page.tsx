@@ -87,18 +87,12 @@ export function MySubmissionsPage() {
           {submissions.map((s) => {
             const dateToShow = s.status === 'draft' ? s.created_at : (s.submitted_at ?? s.created_at);
             return (
-              <div
+              <Button
                 key={s.id}
-                role="button"
-                tabIndex={0}
-                className="flex items-start justify-between gap-4 px-4 py-3 cursor-pointer transition duration-100 ease-linear hover:bg-primary_hover focus-visible:outline-2 focus-visible:outline-brand"
+                color="tertiary"
+                size="md"
                 onClick={() => handleRowClick(s)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleRowClick(s);
-                  }
-                }}
+                className="flex w-full items-start justify-between gap-4 px-4 py-3 text-left first:rounded-t-xl last:rounded-b-xl"
               >
                 <div className="flex flex-col gap-1 min-w-0">
                   <span className="text-sm font-medium text-primary truncate">{s.title}</span>
@@ -124,7 +118,7 @@ export function MySubmissionsPage() {
                 >
                   {submissionStatusLabel(s.status)}
                 </BadgeWithDot>
-              </div>
+              </Button>
             );
           })}
         </div>

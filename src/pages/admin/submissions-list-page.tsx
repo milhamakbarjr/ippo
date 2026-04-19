@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Tab, TabList, TabPanel, Tabs } from '@/components/application/tabs/tabs';
+import { Button } from '@/components/base/buttons/button';
 import { BadgeWithDot } from '@/components/base/badges/badges';
 import { submissionBadgeColor, submissionStatusLabel, formatSubmissionDate, CATEGORY_LABELS } from '@/utils/submission-status';
 import { LEVEL_LABELS } from '@/content/levels';
@@ -95,11 +96,12 @@ export function AdminSubmissionsListPage() {
               ) : (
                 <div className="divide-y divide-secondary rounded-xl border border-secondary bg-primary">
                   {submissions.map((sub) => (
-                    <button
+                    <Button
                       key={sub.id}
-                      type="button"
+                      color="tertiary"
+                      size="md"
                       onClick={() => void navigate({ to: '/admin/submissions/$id', params: { id: sub.id } })}
-                      className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left transition duration-100 ease-linear hover:bg-primary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand first:rounded-t-xl last:rounded-b-xl"
+                      className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left first:rounded-t-xl last:rounded-b-xl"
                     >
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-primary">
@@ -120,7 +122,7 @@ export function AdminSubmissionsListPage() {
                       >
                         {submissionStatusLabel(sub.status)}
                       </BadgeWithDot>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               )}
