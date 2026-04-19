@@ -1,5 +1,6 @@
 import { LogOut01, Settings01, User01 } from '@untitledui/icons';
 import { useNavigate } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button as AriaButton } from 'react-aria-components';
 import { Avatar } from '@/components/base/avatar/avatar';
 import { AvatarLabelGroup } from '@/components/base/avatar/avatar-label-group';
@@ -16,10 +17,13 @@ interface IppoAccountMenuProps {
 export function IppoAccountMenu({ variant = 'avatar' }: IppoAccountMenuProps) {
   const { data: session } = authClient.useSession();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const email = session?.user?.email ?? '';
 
   const handleSignOut = async () => {
     await authClient.signOut();
+    // Clear all cached queries so the next user starts with a fresh session
+    queryClient.clear();
     window.location.href = '/auth/login';
   };
 

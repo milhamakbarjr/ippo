@@ -72,6 +72,12 @@ export function OnboardingPage() {
           localStorage.setItem('assessment_level', 'kana');
           sessionStorage.setItem('user_level', 'kana');
         } catch { /* ignore */ }
+        // Persist to DB for authenticated users so the onboarding gate passes on future logins
+        fetch('/api/assessment/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ assessed_level: 'kana', from_scratch: true }),
+        }).catch(() => { /* non-blocking */ });
         void navigate({ to: '/', replace: true });
       } else {
         // find-my-level → start quiz

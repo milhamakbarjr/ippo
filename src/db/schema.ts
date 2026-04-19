@@ -19,6 +19,7 @@ export const users = pgTable('users', {
   name:                varchar('name', { length: 255 }),
   preferred_language:  varchar('preferred_language', { length: 2 }).default('id'),
   assessed_level:      varchar('assessed_level', { length: 10 }),
+  onboarding_completed: boolean('onboarding_completed').default(false).notNull(),
   xp:                  integer('xp').default(0).notNull(),
   streak:              integer('streak').default(0).notNull(),
   last_completion_date: timestamp('last_completion_date'),

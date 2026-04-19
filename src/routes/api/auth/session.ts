@@ -17,7 +17,7 @@ export const Route = createFileRoute('/api/auth/session')({
         if (!data?.user?.email) return Response.json({ user: null });
 
         const [appUser] = await db
-          .select({ id: users.id, email: users.email, name: users.name, assessed_level: users.assessed_level, preferred_language: users.preferred_language })
+          .select({ id: users.id, email: users.email, name: users.name, assessed_level: users.assessed_level, preferred_language: users.preferred_language, role: users.role, onboarding_completed: users.onboarding_completed })
           .from(users)
           .where(eq(users.email, data.user.email))
           .limit(1);
@@ -29,8 +29,10 @@ export const Route = createFileRoute('/api/auth/session')({
             id:             appUser.id,
             email:          appUser.email,
             name:           appUser.name,
-            assessed_level: appUser.assessed_level,
-            language:       appUser.preferred_language ?? 'id',
+            assessed_level:       appUser.assessed_level,
+            language:             appUser.preferred_language ?? 'id',
+            role:                 appUser.role,
+            onboarding_completed: appUser.onboarding_completed,
           },
         });
       },

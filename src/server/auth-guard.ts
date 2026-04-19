@@ -50,6 +50,20 @@ export async function requireAuth(request: Request): Promise<AuthGuardSuccess | 
   };
 }
 
+/** Returns a 403 Response if the user is not an admin, otherwise null. */
+export function requireAdminRole(appUser: User): Response | null {
+  return appUser.role === 'admin'
+    ? null
+    : Response.json({ error: 'Forbidden' }, { status: 403 });
+}
+
+/** Returns a 403 Response if the user is not a contributor or admin, otherwise null. */
+export function requireContributorRole(appUser: User): Response | null {
+  return appUser.role === 'contributor' || appUser.role === 'admin'
+    ? null
+    : Response.json({ error: 'Forbidden' }, { status: 403 });
+}
+
 /** For public routes that optionally personalize for authenticated users. Returns null for guests. */
 export async function optionalAuth(request: Request): Promise<AuthGuardSuccess | null> {
   const sessionData = await getSessionData(request);

@@ -58,7 +58,7 @@ export const Route = createFileRoute('/api/assessment/submit')({
 
           await db
             .update(users)
-            .set({ assessed_level, updated_at: new Date() })
+            .set({ assessed_level, onboarding_completed: true, updated_at: new Date() })
             .where(eq(users.id, appUser.id));
 
           return Response.json({ success: true, assessedLevel: assessed_level });

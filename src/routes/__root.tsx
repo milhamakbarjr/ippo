@@ -1,16 +1,18 @@
 import { HeadContent, Outlet, createRootRoute, useLocation } from "@tanstack/react-router";
 import { Scripts } from "@tanstack/react-router";
 import { Toaster } from "sonner";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
 import { TopbarIppo } from "@/pages/dashboard/components/topbar-ippo";
-import { dashboardNavItems, dashboardFooterItems } from "@/pages/dashboard/components/dashboard-nav-items";
+import { dashboardNavItems, dashboardFooterItems, adminNavItems, contributorNavItems } from "@/pages/dashboard/components/dashboard-nav-items";
 import { QueryProvider } from "@/providers/query-provider";
 import { RouteProvider } from "@/providers/router-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "@/styles/globals.css";
 
 /** Routes that show the top navigation bar */
-const TOPBAR_PREFIXES = ['/', '/profile', '/learning', '/letters'];
+const TOPBAR_PREFIXES = ['/', '/profile', '/learning', '/letters', '/admin', '/contributor'];
 
 export const Route = createRootRoute({
     head: () => ({
@@ -37,10 +39,31 @@ function AppShell() {
     const { pathname } = useLocation();
     const { data: session } = authClient.useSession();
     const isAuthenticated = !!session?.user;
+
+    const { data: sessionData } = useQuery({
+        queryKey: ['session-role'],
+        queryFn: async () => {
+            const res = await fetch('/api/auth/session');
+            return res.json() as Promise<{ user: { role?: string } | null }>;
+        },
+        enabled: isAuthenticated,
+    });
+
+    const role = sessionData?.user?.role;
+
+    const navItems = useMemo(
+        () => role === 'admin'
+            ? [...dashboardNavItems, ...adminNavItems]
+            : role === 'contributor'
+                ? [...dashboardNavItems, ...contributorNavItems]
+                : dashboardNavItems,
+        [role],
+    );
+
     const showTopbar = TOPBAR_PREFIXES.some(
         (prefix) => pathname === prefix || (prefix !== '/' && pathname.startsWith(prefix + '/'))
     );
-    const activeUrl = dashboardNavItems.find(
+    const activeUrl = navItems.find(
         (item) => item.href === pathname || (item.href !== '/' && item.href != null && pathname.startsWith(item.href + '/')),
     )?.href ?? pathname;
 
@@ -50,7 +73,7 @@ function AppShell() {
         <div className="min-h-dvh bg-primary">
             <TopbarIppo
                 activeUrl={activeUrl}
-                items={dashboardNavItems}
+                items={navItems}
                 footerItems={dashboardFooterItems}
                 isAuthenticated={isAuthenticated}
             />
