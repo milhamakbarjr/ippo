@@ -11,6 +11,7 @@ import { TextArea } from '@/components/base/textarea/textarea';
 import { NativeSelect } from '@/components/base/select/select-native';
 import { LEVEL_LABELS, LEVEL_ORDER } from '@/content/levels';
 import { CATEGORY_LABELS } from '@/utils/submission-status';
+import { JLPT_EXAM_CONFIG } from '@/config/jlpt-exam-config';
 import { QuestionForm } from './components/question-form';
 import { BulkUpload } from './components/bulk-upload';
 import { toast } from '@/lib/toast';
@@ -189,6 +190,16 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
 
   const isBusy = saveMutation.isPending || submitForReviewMutation.isPending;
 
+  const jlptTarget = JLPT_EXAM_CONFIG[level]?.[category as QuizQuestionInput['category']];
+  const jlptHint = jlptTarget === undefined || jlptTarget === 0 ? (
+    <p className="text-xs text-tertiary">Kanji termasuk dalam bagian Kosakata di ujian JLPT resmi.</p>
+  ) : (
+    <p className="text-xs text-tertiary">
+      Target JLPT {LEVEL_LABELS[level as keyof typeof LEVEL_LABELS]}:{' '}
+      <span className="font-medium text-secondary">{jlptTarget} soal</span> untuk kategori {CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS]?.toLowerCase()}.
+    </p>
+  );
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-6 flex flex-col gap-6">
       <div>
@@ -246,6 +257,8 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
             options={CATEGORY_OPTIONS}
           />
         </div>
+
+        {jlptHint}
       </div>
 
       <div className="flex flex-col gap-4">
