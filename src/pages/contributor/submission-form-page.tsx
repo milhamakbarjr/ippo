@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Plus } from '@untitledui/icons';
@@ -8,8 +8,11 @@ import { QuizSubmissionCreateSchema } from '@/db/validators';
 import { Button } from '@/components/base/buttons/button';
 import { Input } from '@/components/base/input/input';
 import { NativeSelect } from '@/components/base/select/select-native';
+import { LEVEL_LABELS, LEVEL_ORDER } from '@/content/levels';
+import { CATEGORY_LABELS } from '@/utils/submission-status';
 import { QuestionForm } from './components/question-form';
 import { BulkUpload } from './components/bulk-upload';
+import { toast } from '@/lib/toast';
 
 interface SubmissionFormPageProps {
   submissionId?: string;
@@ -17,21 +20,8 @@ interface SubmissionFormPageProps {
 
 type SubmissionResponse = { submission: QuizSubmission };
 
-const LEVEL_OPTIONS = [
-  { value: 'kana', label: 'Kana' },
-  { value: 'n5', label: 'N5' },
-  { value: 'n4', label: 'N4' },
-  { value: 'n3', label: 'N3' },
-  { value: 'n2', label: 'N2' },
-  { value: 'n1', label: 'N1' },
-];
-
-const CATEGORY_OPTIONS = [
-  { value: 'vocab', label: 'Kosakata' },
-  { value: 'kanji', label: 'Kanji' },
-  { value: 'grammar', label: 'Tata Bahasa' },
-  { value: 'reading', label: 'Membaca' },
-];
+const LEVEL_OPTIONS = LEVEL_ORDER.map((value) => ({ value, label: LEVEL_LABELS[value] }));
+const CATEGORY_OPTIONS = Object.entries(CATEGORY_LABELS).map(([value, label]) => ({ value, label }));
 
 function slugify(title: string): string {
   return title
@@ -67,7 +57,7 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
   const [category, setCategory] = useState('vocab');
   const [questions, setQuestions] = useState<QuizQuestionInput[]>([]);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [initialized, setInitialized] = useState(false);
+  const initialized = useRef(false);
 
   // Fetch existing submission when editing
   const { data: submissionsData } = useQuery<SubmissionResponse>({
@@ -83,7 +73,7 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
 
   // Populate form when editing
   useEffect(() => {
-    if (!isEditMode || initialized) return;
+    if (!isEditMode || initialized.current) return;
     const existing = submissionsData?.submission;
     if (!existing) return;
     setTitle(existing.title);
@@ -92,8 +82,8 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
     setLevel(existing.level);
     setCategory(existing.category);
     setQuestions(existing.questions as QuizQuestionInput[]);
-    setInitialized(true);
-  }, [submissionsData, submissionId, isEditMode, initialized]);
+    initialized.current = true;
+  }, [submissionsData, submissionId, isEditMode]);
 
   // Auto-fill slug from title when not manually edited
   useEffect(() => {
@@ -140,7 +130,10 @@ export function SubmissionFormPage({ submissionId }: SubmissionFormPageProps) {
       }
       return res.json() as Promise<{ success: boolean }>;
     },
-    onSuccess: () => void navigate({ to: '/contributor/submissions' }),
+    onSuccess: () => {
+      toast.success('Submission berhasil dikirim untuk review!');
+      void navigate({ to: '/contributor/submissions' });
+    },
   });
 
   const validate = () => {

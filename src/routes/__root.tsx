@@ -47,6 +47,7 @@ function AppShell() {
             return res.json() as Promise<{ user: { role?: string } | null }>;
         },
         enabled: isAuthenticated,
+        staleTime: 1000 * 30,
     });
 
     const role = sessionData?.user?.role;

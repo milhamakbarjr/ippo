@@ -26,10 +26,13 @@ import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as ApiAchievementsRouteImport } from './routes/api/achievements'
 import { Route as AdminSubmissionsRouteImport } from './routes/admin/submissions'
 import { Route as LearningLevelIndexRouteImport } from './routes/learning/$level.index'
+import { Route as ContributorSubmissionsIndexRouteImport } from './routes/contributor/submissions.index'
 import { Route as ApiQuizBankIndexRouteImport } from './routes/api/quiz-bank/index'
+import { Route as AdminSubmissionsIndexRouteImport } from './routes/admin/submissions.index'
 import { Route as LettersTipsTypeRouteImport } from './routes/letters/tips.$type'
 import { Route as LearningLevelStepSlugRouteImport } from './routes/learning/$level.$stepSlug'
 import { Route as ContributorSubmissionsNewRouteImport } from './routes/contributor/submissions.new'
+import { Route as ContributorSubmissionsIdRouteImport } from './routes/contributor/submissions.$id'
 import { Route as ApiQuizSubmitRouteImport } from './routes/api/quiz/submit'
 import { Route as ApiQuizBankSlugRouteImport } from './routes/api/quiz-bank/$slug'
 import { Route as ApiProgressCompleteRouteImport } from './routes/api/progress/complete'
@@ -42,6 +45,7 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAssessmentSubmitRouteImport } from './routes/api/assessment/submit'
 import { Route as AdminSubmissionsIdRouteImport } from './routes/admin/submissions.$id'
 import { Route as LettersTipsTypeIndexRouteImport } from './routes/letters/tips.$type.index'
+import { Route as ContributorSubmissionsIdIndexRouteImport } from './routes/contributor/submissions.$id.index'
 import { Route as ApiContributorSubmissionsIndexRouteImport } from './routes/api/contributor/submissions/index'
 import { Route as ApiAdminSubmissionsIndexRouteImport } from './routes/api/admin/submissions/index'
 import { Route as LettersTipsTypeTipSlugRouteImport } from './routes/letters/tips.$type.$tipSlug'
@@ -141,10 +145,21 @@ const LearningLevelIndexRoute = LearningLevelIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LearningLevelRoute,
 } as any)
+const ContributorSubmissionsIndexRoute =
+  ContributorSubmissionsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ContributorSubmissionsRoute,
+  } as any)
 const ApiQuizBankIndexRoute = ApiQuizBankIndexRouteImport.update({
   id: '/api/quiz-bank/',
   path: '/api/quiz-bank/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSubmissionsIndexRoute = AdminSubmissionsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminSubmissionsRoute,
 } as any)
 const LettersTipsTypeRoute = LettersTipsTypeRouteImport.update({
   id: '/tips/$type',
@@ -160,6 +175,12 @@ const ContributorSubmissionsNewRoute =
   ContributorSubmissionsNewRouteImport.update({
     id: '/new',
     path: '/new',
+    getParentRoute: () => ContributorSubmissionsRoute,
+  } as any)
+const ContributorSubmissionsIdRoute =
+  ContributorSubmissionsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
     getParentRoute: () => ContributorSubmissionsRoute,
   } as any)
 const ApiQuizSubmitRoute = ApiQuizSubmitRouteImport.update({
@@ -222,6 +243,12 @@ const LettersTipsTypeIndexRoute = LettersTipsTypeIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LettersTipsTypeRoute,
 } as any)
+const ContributorSubmissionsIdIndexRoute =
+  ContributorSubmissionsIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ContributorSubmissionsIdRoute,
+  } as any)
 const ApiContributorSubmissionsIndexRoute =
   ApiContributorSubmissionsIndexRouteImport.update({
     id: '/api/contributor/submissions/',
@@ -241,9 +268,9 @@ const LettersTipsTypeTipSlugRoute = LettersTipsTypeTipSlugRouteImport.update({
 } as any)
 const ContributorSubmissionsIdEditRoute =
   ContributorSubmissionsIdEditRouteImport.update({
-    id: '/$id/edit',
-    path: '/$id/edit',
-    getParentRoute: () => ContributorSubmissionsRoute,
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => ContributorSubmissionsIdRoute,
   } as any)
 const ApiQuizSlugHistoryRoute = ApiQuizSlugHistoryRouteImport.update({
   id: '/api/quiz/$slug/history',
@@ -326,10 +353,13 @@ export interface FileRoutesByFullPath {
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/api/quiz-bank/$slug': typeof ApiQuizBankSlugRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
+  '/contributor/submissions/$id': typeof ContributorSubmissionsIdRouteWithChildren
   '/contributor/submissions/new': typeof ContributorSubmissionsNewRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
   '/letters/tips/$type': typeof LettersTipsTypeRouteWithChildren
+  '/admin/submissions/': typeof AdminSubmissionsIndexRoute
   '/api/quiz-bank/': typeof ApiQuizBankIndexRoute
+  '/contributor/submissions/': typeof ContributorSubmissionsIndexRoute
   '/learning/$level/': typeof LearningLevelIndexRoute
   '/api/admin/submissions/$id': typeof ApiAdminSubmissionsIdRouteWithChildren
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
@@ -338,6 +368,7 @@ export interface FileRoutesByFullPath {
   '/letters/tips/$type/$tipSlug': typeof LettersTipsTypeTipSlugRoute
   '/api/admin/submissions/': typeof ApiAdminSubmissionsIndexRoute
   '/api/contributor/submissions/': typeof ApiContributorSubmissionsIndexRoute
+  '/contributor/submissions/$id/': typeof ContributorSubmissionsIdIndexRoute
   '/letters/tips/$type/': typeof LettersTipsTypeIndexRoute
   '/api/admin/submissions/$id/approve': typeof ApiAdminSubmissionsIdApproveRoute
   '/api/admin/submissions/$id/reject': typeof ApiAdminSubmissionsIdRejectRoute
@@ -352,12 +383,10 @@ export interface FileRoutesByTo {
   '/contributor': typeof ContributorRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
-  '/admin/submissions': typeof AdminSubmissionsRouteWithChildren
   '/api/achievements': typeof ApiAchievementsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-otp': typeof AuthVerifyOtpRoute
-  '/contributor/submissions': typeof ContributorSubmissionsRouteWithChildren
   '/quizzes/$slug': typeof QuizzesSlugRoute
   '/learning': typeof LearningIndexRoute
   '/letters': typeof LettersIndexRoute
@@ -374,7 +403,9 @@ export interface FileRoutesByTo {
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
   '/contributor/submissions/new': typeof ContributorSubmissionsNewRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
+  '/admin/submissions': typeof AdminSubmissionsIndexRoute
   '/api/quiz-bank': typeof ApiQuizBankIndexRoute
+  '/contributor/submissions': typeof ContributorSubmissionsIndexRoute
   '/learning/$level': typeof LearningLevelIndexRoute
   '/api/admin/submissions/$id': typeof ApiAdminSubmissionsIdRouteWithChildren
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
@@ -383,6 +414,7 @@ export interface FileRoutesByTo {
   '/letters/tips/$type/$tipSlug': typeof LettersTipsTypeTipSlugRoute
   '/api/admin/submissions': typeof ApiAdminSubmissionsIndexRoute
   '/api/contributor/submissions': typeof ApiContributorSubmissionsIndexRoute
+  '/contributor/submissions/$id': typeof ContributorSubmissionsIdIndexRoute
   '/letters/tips/$type': typeof LettersTipsTypeIndexRoute
   '/api/admin/submissions/$id/approve': typeof ApiAdminSubmissionsIdApproveRoute
   '/api/admin/submissions/$id/reject': typeof ApiAdminSubmissionsIdRejectRoute
@@ -420,10 +452,13 @@ export interface FileRoutesById {
   '/api/progress/complete': typeof ApiProgressCompleteRoute
   '/api/quiz-bank/$slug': typeof ApiQuizBankSlugRoute
   '/api/quiz/submit': typeof ApiQuizSubmitRoute
+  '/contributor/submissions/$id': typeof ContributorSubmissionsIdRouteWithChildren
   '/contributor/submissions/new': typeof ContributorSubmissionsNewRoute
   '/learning/$level/$stepSlug': typeof LearningLevelStepSlugRoute
   '/letters/tips/$type': typeof LettersTipsTypeRouteWithChildren
+  '/admin/submissions/': typeof AdminSubmissionsIndexRoute
   '/api/quiz-bank/': typeof ApiQuizBankIndexRoute
+  '/contributor/submissions/': typeof ContributorSubmissionsIndexRoute
   '/learning/$level/': typeof LearningLevelIndexRoute
   '/api/admin/submissions/$id': typeof ApiAdminSubmissionsIdRouteWithChildren
   '/api/learning/$level/progress': typeof ApiLearningLevelProgressRoute
@@ -432,6 +467,7 @@ export interface FileRoutesById {
   '/letters/tips/$type/$tipSlug': typeof LettersTipsTypeTipSlugRoute
   '/api/admin/submissions/': typeof ApiAdminSubmissionsIndexRoute
   '/api/contributor/submissions/': typeof ApiContributorSubmissionsIndexRoute
+  '/contributor/submissions/$id/': typeof ContributorSubmissionsIdIndexRoute
   '/letters/tips/$type/': typeof LettersTipsTypeIndexRoute
   '/api/admin/submissions/$id/approve': typeof ApiAdminSubmissionsIdApproveRoute
   '/api/admin/submissions/$id/reject': typeof ApiAdminSubmissionsIdRejectRoute
@@ -470,10 +506,13 @@ export interface FileRouteTypes {
     | '/api/progress/complete'
     | '/api/quiz-bank/$slug'
     | '/api/quiz/submit'
+    | '/contributor/submissions/$id'
     | '/contributor/submissions/new'
     | '/learning/$level/$stepSlug'
     | '/letters/tips/$type'
+    | '/admin/submissions/'
     | '/api/quiz-bank/'
+    | '/contributor/submissions/'
     | '/learning/$level/'
     | '/api/admin/submissions/$id'
     | '/api/learning/$level/progress'
@@ -482,6 +521,7 @@ export interface FileRouteTypes {
     | '/letters/tips/$type/$tipSlug'
     | '/api/admin/submissions/'
     | '/api/contributor/submissions/'
+    | '/contributor/submissions/$id/'
     | '/letters/tips/$type/'
     | '/api/admin/submissions/$id/approve'
     | '/api/admin/submissions/$id/reject'
@@ -496,12 +536,10 @@ export interface FileRouteTypes {
     | '/contributor'
     | '/onboarding'
     | '/profile'
-    | '/admin/submissions'
     | '/api/achievements'
     | '/auth/login'
     | '/auth/register'
     | '/auth/verify-otp'
-    | '/contributor/submissions'
     | '/quizzes/$slug'
     | '/learning'
     | '/letters'
@@ -518,7 +556,9 @@ export interface FileRouteTypes {
     | '/api/quiz/submit'
     | '/contributor/submissions/new'
     | '/learning/$level/$stepSlug'
+    | '/admin/submissions'
     | '/api/quiz-bank'
+    | '/contributor/submissions'
     | '/learning/$level'
     | '/api/admin/submissions/$id'
     | '/api/learning/$level/progress'
@@ -527,6 +567,7 @@ export interface FileRouteTypes {
     | '/letters/tips/$type/$tipSlug'
     | '/api/admin/submissions'
     | '/api/contributor/submissions'
+    | '/contributor/submissions/$id'
     | '/letters/tips/$type'
     | '/api/admin/submissions/$id/approve'
     | '/api/admin/submissions/$id/reject'
@@ -563,10 +604,13 @@ export interface FileRouteTypes {
     | '/api/progress/complete'
     | '/api/quiz-bank/$slug'
     | '/api/quiz/submit'
+    | '/contributor/submissions/$id'
     | '/contributor/submissions/new'
     | '/learning/$level/$stepSlug'
     | '/letters/tips/$type'
+    | '/admin/submissions/'
     | '/api/quiz-bank/'
+    | '/contributor/submissions/'
     | '/learning/$level/'
     | '/api/admin/submissions/$id'
     | '/api/learning/$level/progress'
@@ -575,6 +619,7 @@ export interface FileRouteTypes {
     | '/letters/tips/$type/$tipSlug'
     | '/api/admin/submissions/'
     | '/api/contributor/submissions/'
+    | '/contributor/submissions/$id/'
     | '/letters/tips/$type/'
     | '/api/admin/submissions/$id/approve'
     | '/api/admin/submissions/$id/reject'
@@ -739,12 +784,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearningLevelIndexRouteImport
       parentRoute: typeof LearningLevelRoute
     }
+    '/contributor/submissions/': {
+      id: '/contributor/submissions/'
+      path: '/'
+      fullPath: '/contributor/submissions/'
+      preLoaderRoute: typeof ContributorSubmissionsIndexRouteImport
+      parentRoute: typeof ContributorSubmissionsRoute
+    }
     '/api/quiz-bank/': {
       id: '/api/quiz-bank/'
       path: '/api/quiz-bank'
       fullPath: '/api/quiz-bank/'
       preLoaderRoute: typeof ApiQuizBankIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/submissions/': {
+      id: '/admin/submissions/'
+      path: '/'
+      fullPath: '/admin/submissions/'
+      preLoaderRoute: typeof AdminSubmissionsIndexRouteImport
+      parentRoute: typeof AdminSubmissionsRoute
     }
     '/letters/tips/$type': {
       id: '/letters/tips/$type'
@@ -765,6 +824,13 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/contributor/submissions/new'
       preLoaderRoute: typeof ContributorSubmissionsNewRouteImport
+      parentRoute: typeof ContributorSubmissionsRoute
+    }
+    '/contributor/submissions/$id': {
+      id: '/contributor/submissions/$id'
+      path: '/$id'
+      fullPath: '/contributor/submissions/$id'
+      preLoaderRoute: typeof ContributorSubmissionsIdRouteImport
       parentRoute: typeof ContributorSubmissionsRoute
     }
     '/api/quiz/submit': {
@@ -851,6 +917,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LettersTipsTypeIndexRouteImport
       parentRoute: typeof LettersTipsTypeRoute
     }
+    '/contributor/submissions/$id/': {
+      id: '/contributor/submissions/$id/'
+      path: '/'
+      fullPath: '/contributor/submissions/$id/'
+      preLoaderRoute: typeof ContributorSubmissionsIdIndexRouteImport
+      parentRoute: typeof ContributorSubmissionsIdRoute
+    }
     '/api/contributor/submissions/': {
       id: '/api/contributor/submissions/'
       path: '/api/contributor/submissions'
@@ -874,10 +947,10 @@ declare module '@tanstack/react-router' {
     }
     '/contributor/submissions/$id/edit': {
       id: '/contributor/submissions/$id/edit'
-      path: '/$id/edit'
+      path: '/edit'
       fullPath: '/contributor/submissions/$id/edit'
       preLoaderRoute: typeof ContributorSubmissionsIdEditRouteImport
-      parentRoute: typeof ContributorSubmissionsRoute
+      parentRoute: typeof ContributorSubmissionsIdRoute
     }
     '/api/quiz/$slug/history': {
       id: '/api/quiz/$slug/history'
@@ -947,10 +1020,12 @@ declare module '@tanstack/react-router' {
 
 interface AdminSubmissionsRouteChildren {
   AdminSubmissionsIdRoute: typeof AdminSubmissionsIdRoute
+  AdminSubmissionsIndexRoute: typeof AdminSubmissionsIndexRoute
 }
 
 const AdminSubmissionsRouteChildren: AdminSubmissionsRouteChildren = {
   AdminSubmissionsIdRoute: AdminSubmissionsIdRoute,
+  AdminSubmissionsIndexRoute: AdminSubmissionsIndexRoute,
 }
 
 const AdminSubmissionsRouteWithChildren =
@@ -966,15 +1041,33 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface ContributorSubmissionsRouteChildren {
-  ContributorSubmissionsNewRoute: typeof ContributorSubmissionsNewRoute
+interface ContributorSubmissionsIdRouteChildren {
   ContributorSubmissionsIdEditRoute: typeof ContributorSubmissionsIdEditRoute
+  ContributorSubmissionsIdIndexRoute: typeof ContributorSubmissionsIdIndexRoute
+}
+
+const ContributorSubmissionsIdRouteChildren: ContributorSubmissionsIdRouteChildren =
+  {
+    ContributorSubmissionsIdEditRoute: ContributorSubmissionsIdEditRoute,
+    ContributorSubmissionsIdIndexRoute: ContributorSubmissionsIdIndexRoute,
+  }
+
+const ContributorSubmissionsIdRouteWithChildren =
+  ContributorSubmissionsIdRoute._addFileChildren(
+    ContributorSubmissionsIdRouteChildren,
+  )
+
+interface ContributorSubmissionsRouteChildren {
+  ContributorSubmissionsIdRoute: typeof ContributorSubmissionsIdRouteWithChildren
+  ContributorSubmissionsNewRoute: typeof ContributorSubmissionsNewRoute
+  ContributorSubmissionsIndexRoute: typeof ContributorSubmissionsIndexRoute
 }
 
 const ContributorSubmissionsRouteChildren: ContributorSubmissionsRouteChildren =
   {
+    ContributorSubmissionsIdRoute: ContributorSubmissionsIdRouteWithChildren,
     ContributorSubmissionsNewRoute: ContributorSubmissionsNewRoute,
-    ContributorSubmissionsIdEditRoute: ContributorSubmissionsIdEditRoute,
+    ContributorSubmissionsIndexRoute: ContributorSubmissionsIndexRoute,
   }
 
 const ContributorSubmissionsRouteWithChildren =

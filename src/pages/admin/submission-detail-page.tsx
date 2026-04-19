@@ -3,11 +3,30 @@ import { useNavigate, useParams } from '@tanstack/react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/base/buttons/button';
 import { BadgeWithDot } from '@/components/base/badges/badges';
-import type { QuizSubmission } from '@/db/schema';
+import { AvatarLabelGroup } from '@/components/base/avatar/avatar-label-group';
 import { QuizQuestionInputSchema } from '@/db/validators';
 import type { QuizQuestionInput } from '@/db/validators';
 import { z } from 'zod';
-import { submissionBadgeColor, submissionStatusLabel } from '@/utils/submission-status';
+import { submissionBadgeColor, submissionStatusLabel, formatSubmissionDate } from '@/utils/submission-status';
+
+type AdminSubmissionDetail = {
+  id: string;
+  submitted_by: string;
+  slug: string;
+  title: string;
+  level: string;
+  category: string;
+  questions: unknown;
+  status: string;
+  review_note: string | null;
+  submitted_at: Date | string | null;
+  reviewed_at: Date | string | null;
+  created_at: Date | string;
+  updated_at: Date | string;
+  reviewer_id: string | null;
+  submitter: { id: string; name: string | null; email: string };
+  reviewer: { id: string; name: string | null; email: string } | null;
+};
 
 export function AdminSubmissionDetailPage() {
   const navigate = useNavigate();
@@ -15,15 +34,15 @@ export function AdminSubmissionDetailPage() {
 
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [reviewNote, setReviewNote]         = useState('');
-  const [rejectError, setRejectError]       = useState('');
 
-  const { data, isLoading, error } = useQuery<{ submission: QuizSubmission }>({
+  const { data, isLoading, error } = useQuery<{ submission: AdminSubmissionDetail }>({
     queryKey: ['admin-submission', id],
     queryFn:  async () => {
       const res = await fetch(`/api/admin/submissions/${id}`);
       if (!res.ok) throw new Error('Submission tidak ditemukan');
-      return res.json() as Promise<{ submission: QuizSubmission }>;
+      return res.json() as Promise<{ submission: AdminSubmissionDetail }>;
     },
+    staleTime: 1000 * 30,
   });
 
   const approveMutation = useMutation({
@@ -59,11 +78,7 @@ export function AdminSubmissionDetailPage() {
   });
 
   const handleReject = () => {
-    if (!reviewNote.trim()) {
-      setRejectError('Catatan review wajib diisi.');
-      return;
-    }
-    setRejectError('');
+    if (!reviewNote.trim()) return;
     rejectMutation.mutate(reviewNote);
   };
 
@@ -97,9 +112,7 @@ export function AdminSubmissionDetailPage() {
   const sub = data.submission;
 
   const parsedQuestions = z.array(QuizQuestionInputSchema).safeParse(sub.questions);
-  const questions: QuizQuestionInput[] = parsedQuestions.success
-    ? (parsedQuestions.data as QuizQuestionInput[])
-    : [];
+  const questions: QuizQuestionInput[] = parsedQuestions.success ? parsedQuestions.data : [];
 
   const isPending = sub.status === 'pending_review';
 
@@ -128,6 +141,43 @@ export function AdminSubmissionDetailPage() {
         >
           {submissionStatusLabel(sub.status)}
         </BadgeWithDot>
+      </div>
+
+      {/* Metadata card */}
+      <div className="mb-6 rounded-xl border border-secondary bg-primary p-4 flex flex-col gap-3">
+        {/* Submitter row */}
+        <div>
+          <p className="text-xs font-medium text-tertiary mb-1.5">Kontributor</p>
+          <AvatarLabelGroup
+            size="sm"
+            title={sub.submitter.name ?? 'Tanpa nama'}
+            subtitle={sub.submitter.email}
+          />
+        </div>
+
+        {/* Metadata rows */}
+        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-secondary text-sm">
+          <div>
+            <p className="text-xs text-tertiary">Dikirim</p>
+            <p className="text-sm text-primary">{formatSubmissionDate(sub.submitted_at)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-tertiary">Jumlah Soal</p>
+            <p className="text-sm text-primary">{questions.length} soal</p>
+          </div>
+          {sub.reviewed_at && (
+            <div>
+              <p className="text-xs text-tertiary">Direview</p>
+              <p className="text-sm text-primary">{formatSubmissionDate(sub.reviewed_at)}</p>
+            </div>
+          )}
+          {sub.reviewer && (
+            <div>
+              <p className="text-xs text-tertiary">Reviewer</p>
+              <p className="text-sm text-primary">{sub.reviewer.name ?? sub.reviewer.email}</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Rejection note */}
@@ -198,10 +248,7 @@ export function AdminSubmissionDetailPage() {
               color="secondary-destructive"
               size="sm"
               isDisabled={approveMutation.isPending || rejectMutation.isPending}
-              onClick={() => {
-                setShowRejectForm((v) => !v);
-                setRejectError('');
-              }}
+              onClick={() => setShowRejectForm((v) => !v)}
             >
               Tolak
             </Button>
@@ -224,9 +271,6 @@ export function AdminSubmissionDetailPage() {
                 placeholder="Jelaskan alasan penolakan..."
                 className="w-full rounded-lg border border-primary bg-primary px-3 py-2 text-sm text-primary placeholder:text-placeholder focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:opacity-50"
               />
-              {rejectError && (
-                <p className="mt-1 text-xs text-error-primary">{rejectError}</p>
-              )}
               {rejectMutation.error && (
                 <p className="mt-1 text-xs text-error-primary">
                   {rejectMutation.error.message}
@@ -249,7 +293,6 @@ export function AdminSubmissionDetailPage() {
                   onClick={() => {
                     setShowRejectForm(false);
                     setReviewNote('');
-                    setRejectError('');
                   }}
                 >
                   Batal

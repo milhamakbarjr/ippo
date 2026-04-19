@@ -1,5 +1,12 @@
 export type SubmissionBadgeColor = 'warning' | 'success' | 'error' | 'gray';
 
+export const CATEGORY_LABELS: Record<string, string> = {
+  vocab:   'Kosakata',
+  kanji:   'Kanji',
+  grammar: 'Tata Bahasa',
+  reading: 'Membaca',
+};
+
 export function submissionBadgeColor(status: string): SubmissionBadgeColor {
   switch (status) {
     case 'pending_review': return 'warning';

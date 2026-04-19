@@ -16,11 +16,30 @@ export const Route = createFileRoute('/api/contributor/submissions/')({
         const forbidden = requireContributorRole(appUser);
         if (forbidden) return forbidden;
 
-        const submissions = await db
-          .select()
+        const rows = await db
+          .select({
+            id: quiz_submissions.id,
+            submitted_by: quiz_submissions.submitted_by,
+            slug: quiz_submissions.slug,
+            title: quiz_submissions.title,
+            level: quiz_submissions.level,
+            category: quiz_submissions.category,
+            questions: quiz_submissions.questions,
+            status: quiz_submissions.status,
+            review_note: quiz_submissions.review_note,
+            submitted_at: quiz_submissions.submitted_at,
+            reviewed_at: quiz_submissions.reviewed_at,
+            created_at: quiz_submissions.created_at,
+            updated_at: quiz_submissions.updated_at,
+          })
           .from(quiz_submissions)
           .where(eq(quiz_submissions.submitted_by, appUser.id))
           .orderBy(desc(quiz_submissions.created_at));
+
+        const submissions = rows.map(({ questions, ...rest }) => ({
+          ...rest,
+          question_count: Array.isArray(questions) ? (questions as unknown[]).length : 0,
+        }));
 
         return Response.json({ submissions });
       },

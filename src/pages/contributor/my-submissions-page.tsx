@@ -1,28 +1,29 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Plus } from '@untitledui/icons';
-import type { QuizSubmission } from '@/db/schema';
 import { Button } from '@/components/base/buttons/button';
 import { BadgeWithDot } from '@/components/base/badges/badges';
-import { submissionBadgeColor, submissionStatusLabel, formatSubmissionDate } from '@/utils/submission-status';
+import { submissionBadgeColor, submissionStatusLabel, formatSubmissionDate, CATEGORY_LABELS } from '@/utils/submission-status';
+import { LEVEL_LABELS } from '@/content/levels';
+import type { JLPTLevelId } from '@/types/learning';
 
-type SubmissionsResponse = { submissions: QuizSubmission[] };
-
-const LEVEL_LABELS: Record<string, string> = {
-  kana: 'Kana',
-  n5: 'N5',
-  n4: 'N4',
-  n3: 'N3',
-  n2: 'N2',
-  n1: 'N1',
+type SubmissionListItem = {
+  id: string;
+  submitted_by: string;
+  slug: string;
+  title: string;
+  level: string;
+  category: string;
+  status: string;
+  review_note: string | null;
+  submitted_at: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+  updated_at: string;
+  question_count: number;
 };
 
-const CATEGORY_LABELS: Record<string, string> = {
-  vocab: 'Kosakata',
-  kanji: 'Kanji',
-  grammar: 'Tata Bahasa',
-  reading: 'Membaca',
-};
+type SubmissionsResponse = { submissions: SubmissionListItem[] };
 
 
 export function MySubmissionsPage() {
@@ -76,38 +77,47 @@ export function MySubmissionsPage() {
       {submissions.length > 0 && (
         <div className="flex flex-col divide-y divide-secondary rounded-xl border border-secondary bg-primary overflow-hidden">
           {submissions.map((s) => {
-            const isDraft = s.status === 'draft';
+            const dateToShow = s.status === 'draft' ? s.created_at : (s.submitted_at ?? s.created_at);
             return (
               <div
                 key={s.id}
-                role={isDraft ? 'button' : undefined}
-                tabIndex={isDraft ? 0 : undefined}
-                className={`flex items-start justify-between gap-4 px-4 py-3 ${isDraft ? 'cursor-pointer transition duration-100 ease-linear hover:bg-primary_hover focus-visible:outline-2 focus-visible:outline-brand' : ''}`}
-                onClick={
-                  isDraft
-                    ? () => void navigate({ to: '/contributor/submissions/$id/edit', params: { id: s.id } })
-                    : undefined
-                }
-                onKeyDown={
-                  isDraft
-                    ? (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          void navigate({ to: '/contributor/submissions/$id/edit', params: { id: s.id } });
-                        }
-                      }
-                    : undefined
-                }
+                role="button"
+                tabIndex={0}
+                className="flex items-start justify-between gap-4 px-4 py-3 cursor-pointer transition duration-100 ease-linear hover:bg-primary_hover focus-visible:outline-2 focus-visible:outline-brand"
+                onClick={() => {
+                  if (s.status === 'draft') {
+                    void navigate({ to: '/contributor/submissions/$id/edit', params: { id: s.id } });
+                  } else {
+                    void navigate({ to: '/contributor/submissions/$id', params: { id: s.id } });
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (s.status === 'draft') {
+                      void navigate({ to: '/contributor/submissions/$id/edit', params: { id: s.id } });
+                    } else {
+                      void navigate({ to: '/contributor/submissions/$id', params: { id: s.id } });
+                    }
+                  }
+                }}
               >
                 <div className="flex flex-col gap-1 min-w-0">
                   <span className="text-sm font-medium text-primary truncate">{s.title}</span>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs text-tertiary">{LEVEL_LABELS[s.level] ?? s.level}</span>
-                    <span className="text-xs text-tertiary">•</span>
+                    <span className="text-xs text-tertiary">{LEVEL_LABELS[s.level as JLPTLevelId] ?? s.level}</span>
+                    <span className="text-xs text-tertiary">·</span>
                     <span className="text-xs text-tertiary">{CATEGORY_LABELS[s.category] ?? s.category}</span>
-                    <span className="text-xs text-tertiary">•</span>
-                    <span className="text-xs text-tertiary">{formatSubmissionDate(s.created_at)}</span>
+                    <span className="text-xs text-tertiary">·</span>
+                    <span className="text-xs text-tertiary">{s.question_count} soal</span>
+                    <span className="text-xs text-tertiary">·</span>
+                    <span className="text-xs text-tertiary">{formatSubmissionDate(dateToShow)}</span>
                   </div>
+                  {s.status === 'rejected' && s.review_note && (
+                    <p className="text-xs text-error-primary truncate mt-0.5">
+                      Catatan: {s.review_note}
+                    </p>
+                  )}
                 </div>
                 <BadgeWithDot
                   type="pill-color"

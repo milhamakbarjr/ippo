@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { db } from '@/db';
 import { quiz_submissions } from '@/db/schema';
 import { requireAuth, isAuthError, requireAdminRole } from '@/server/auth-guard';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 const RejectBodySchema = z.object({
@@ -34,30 +34,23 @@ export const Route = createFileRoute('/api/admin/submissions/$id/reject')({
         const { review_note } = parsed.data;
 
         const { id } = params;
+        const now = new Date();
 
-        const [submission] = await db
-          .select({ id: quiz_submissions.id, status: quiz_submissions.status })
-          .from(quiz_submissions)
-          .where(eq(quiz_submissions.id, id))
-          .limit(1);
-
-        if (!submission) {
-          return Response.json({ error: 'Submission not found' }, { status: 404 });
-        }
-        if (submission.status !== 'pending_review') {
-          return Response.json({ error: 'Submission is not pending review' }, { status: 400 });
-        }
-
-        await db
+        const [updated] = await db
           .update(quiz_submissions)
           .set({
             status:      'rejected',
             reviewer_id: appUser.id,
-            reviewed_at: new Date(),
+            reviewed_at: now,
             review_note,
-            updated_at:  new Date(),
+            updated_at:  now,
           })
-          .where(eq(quiz_submissions.id, id));
+          .where(and(eq(quiz_submissions.id, id), eq(quiz_submissions.status, 'pending_review')))
+          .returning({ id: quiz_submissions.id });
+
+        if (!updated) {
+          return Response.json({ error: 'Submission not found or not pending review' }, { status: 404 });
+        }
 
         return Response.json({ success: true });
       },

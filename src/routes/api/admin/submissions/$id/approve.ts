@@ -58,9 +58,10 @@ export const Route = createFileRoute('/api/admin/submissions/$id/approve')({
               added = inserted.length;
             }
 
+            const now = new Date();
             await tx
               .update(quiz_submissions)
-              .set({ status: 'published', reviewer_id: appUser.id, reviewed_at: new Date(), updated_at: new Date() })
+              .set({ status: 'published', reviewer_id: appUser.id, reviewed_at: now, updated_at: now })
               .where(eq(quiz_submissions.id, id));
 
             return added;

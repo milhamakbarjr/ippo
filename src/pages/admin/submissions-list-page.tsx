@@ -3,8 +3,26 @@ import { useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Tab, TabList, TabPanel, Tabs } from '@/components/application/tabs/tabs';
 import { BadgeWithDot } from '@/components/base/badges/badges';
-import type { QuizSubmission } from '@/db/schema';
-import { submissionBadgeColor, submissionStatusLabel, formatSubmissionDate } from '@/utils/submission-status';
+import { submissionBadgeColor, submissionStatusLabel, formatSubmissionDate, CATEGORY_LABELS } from '@/utils/submission-status';
+import { LEVEL_LABELS } from '@/content/levels';
+
+type AdminSubmissionListItem = {
+  id: string;
+  submitted_by: string;
+  slug: string;
+  title: string;
+  level: string;
+  category: string;
+  status: string;
+  review_note: string | null;
+  submitted_at: Date | string | null;
+  reviewed_at: Date | string | null;
+  created_at: Date | string;
+  updated_at: Date | string;
+  reviewer_id: string | null;
+  submitter: { id: string; name: string | null; email: string };
+  question_count: number;
+};
 
 type StatusFilter = 'all' | 'pending_review' | 'published' | 'rejected' | 'draft';
 
@@ -21,7 +39,7 @@ export function AdminSubmissionsListPage() {
 
   const apiStatus = activeStatus === 'all' ? undefined : activeStatus;
 
-  const { data, isLoading } = useQuery<{ submissions: QuizSubmission[] }>({
+  const { data, isLoading } = useQuery<{ submissions: AdminSubmissionListItem[] }>({
     queryKey: ['admin-submissions', apiStatus],
     queryFn:  async () => {
       const url = apiStatus
@@ -29,7 +47,7 @@ export function AdminSubmissionsListPage() {
         : '/api/admin/submissions';
       const res = await fetch(url);
       if (!res.ok) throw new Error('Gagal memuat submissions');
-      return res.json() as Promise<{ submissions: QuizSubmission[] }>;
+      return res.json() as Promise<{ submissions: AdminSubmissionListItem[] }>;
     },
     staleTime: 30_000,
   });
@@ -87,10 +105,10 @@ export function AdminSubmissionsListPage() {
                           {sub.title}
                         </p>
                         <p className="mt-0.5 truncate text-xs text-tertiary">
-                          {sub.slug} &middot; Level {sub.level.toUpperCase()} &middot; {sub.category}
+                          {sub.slug} &middot; {(LEVEL_LABELS as Record<string, string>)[sub.level] ?? `Level ${sub.level.toUpperCase()}`} &middot; {CATEGORY_LABELS[sub.category] ?? sub.category} &middot; {sub.question_count} soal
                         </p>
                         <p className="mt-0.5 text-xs text-tertiary">
-                          {formatSubmissionDate(sub.created_at)}
+                          {sub.submitter.name ?? sub.submitter.email} &middot; {formatSubmissionDate(sub.status === 'draft' ? sub.created_at : (sub.submitted_at ?? sub.created_at))}
                         </p>
                       </div>
 
