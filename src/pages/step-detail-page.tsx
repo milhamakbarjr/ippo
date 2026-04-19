@@ -9,7 +9,6 @@ import { Badge } from '@/components/base/badges/badges';
 import { StepResourceLink } from '@/components/application/learning-path/step-resource-link';
 import { ConfettiBurst } from '@/components/application/learning-path/confetti-burst';
 import { Button } from '@/components/base/buttons/button';
-import { QuizPrompt } from '@/components/application/quiz-prompt';
 import { Route } from '@/routes/learning/$level.$stepSlug';
 import { useCompleteStep } from '@/hooks/use-complete-step';
 import { isStepComplete, markStepComplete } from '@/utils/guest-progress';
@@ -61,15 +60,6 @@ const LEVELS: Partial<Record<JLPTLevelId, Level>> = {
   n3: n3Level,
   n2: n2Level,
   n1: n1Level,
-};
-
-const LEVEL_QUIZ_SLUGS: Partial<Record<string, string>> = {
-  n5: 'n5-vocab',
-  n4: 'n4-vocab',
-  n3: 'n3-vocab',
-  n2: 'n2-grammar',
-  n1: 'n1-grammar',
-  // kana has no quiz
 };
 
 function track(event: string, data: Record<string, unknown>) {
@@ -248,12 +238,21 @@ export function StepDetailPage() {
           )}
         </div>
 
-        {/* Quiz prompt — shown after step completion */}
-        {showQuizPrompt && LEVEL_QUIZ_SLUGS[levelParam] && (
-          <QuizPrompt
-            quizSlug={LEVEL_QUIZ_SLUGS[levelParam]!}
-            onDismiss={() => setShowQuizPrompt(false)}
-          />
+        {/* Quiz catalog CTA — shown after step completion */}
+        {showQuizPrompt && levelParam !== 'kana' && (
+          <div className="mt-6 rounded-xl border border-secondary bg-secondary p-4 flex flex-col gap-3">
+            <p className="text-secondary text-sm font-medium">
+              Uji pemahaman kamu dengan kuis!
+            </p>
+            <div className="flex gap-2">
+              <Button color="primary" size="sm" href="/quizzes">
+                Lihat Katalog Kuis
+              </Button>
+              <Button color="link-gray" size="sm" onClick={() => setShowQuizPrompt(false)}>
+                Lewati
+              </Button>
+            </div>
+          </div>
         )}
 
         {/* Navigation buttons */}

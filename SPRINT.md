@@ -148,29 +148,30 @@ DB-backed quiz system with contributor workflows, JLPT-format quiz catalog, and 
 ---
 
 ## Phase 2D: Contributor Form + Learning Path Polish
-**Status:** ⏳ After 2C
+**Branch:** `feat/phase2d-phase3-cleanup`
+**Status:** ✅ Complete
 
 ### Checklist
-- [ ] Add JLPT question count guidance text on submission form (informational)
-- [ ] Remove hardcoded `LEVEL_QUIZ_SLUGS` from `step-detail-page.tsx`
-- [ ] Add "Lihat Katalog Kuis" CTA on section quiz card and step detail
+- [x] Add JLPT question count guidance text on submission form (informational)
+- [x] Remove hardcoded `LEVEL_QUIZ_SLUGS` from `step-detail-page.tsx`
+- [x] Add "Lihat Katalog Kuis" CTA on section quiz card and step detail
 
 ### Verification
-- [ ] Contributor sees recommended question counts when creating submission
-- [ ] Learning path still shows quiz cards
-- [ ] Quiz catalog link accessible from learning path
+- [x] Contributor sees recommended question counts when creating submission
+- [x] Learning path shows "Lihat Katalog Kuis" CTA after step completion
+- [x] Quiz catalog link accessible from learning path
 
 ---
 
 ## Phase 3: Remove Static Quiz Files
-**Branch:** `feat/phase3-remove-static-quizzes`
-**Status:** ⏳ After Phase 2D
+**Branch:** `feat/phase2d-phase3-cleanup`
+**Status:** ✅ Complete
 
 ### Checklist
-- [ ] All 17 quizzes verified loading from DB
-- [ ] Delete `src/content/quizzes/` directory (all 17 `.ts` files)
-- [ ] Remove any remaining static quiz import references
-- [ ] `npm run build` passes
+- [x] All 17 quizzes verified loading from DB
+- [x] Delete `src/content/quizzes/` directory (all 17 `.ts` files)
+- [x] Remove any remaining static quiz import references (`content-integrity.test.ts` updated)
+- [x] `npm run build` passes
 
 ---
 
