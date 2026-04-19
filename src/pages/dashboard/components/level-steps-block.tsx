@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { StepItem } from '@/components/application/learning-path/step-item';
 import { LearningPath } from '@/components/application/learning-path/learning-path';
@@ -28,9 +29,23 @@ export function LevelStepsBlock({
   const levelConfig = LEVELS[levelId];
   const { data: authProgress } = useLevelProgress(levelId, isAuthenticated ? userId : undefined);
 
+  // Initialize with empty progress to match SSR; populated after hydration via useEffect.
+  const [guestProgress, setGuestProgress] = useState(() => ({
+    completedSlugs: [] as string[],
+    completedCount: 0,
+    totalCount: levelConfig?.steps.length ?? 0,
+    progressPercent: 0,
+    recommendedNextSlug: levelConfig?.steps[0]?.slug,
+  }));
+
+  useEffect(() => {
+    if (!isAuthenticated && levelConfig) {
+      setGuestProgress(getLevelProgress(levelConfig));
+    }
+  }, [isAuthenticated, levelConfig]);
+
   if (!levelConfig) return null;
 
-  const guestProgress = getLevelProgress(levelConfig);
   const completedSlugs = isAuthenticated
     ? (authProgress?.steps.filter((s) => s.completed).map((s) => s.slug) ?? [])
     : guestProgress.completedSlugs;

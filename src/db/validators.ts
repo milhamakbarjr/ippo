@@ -19,8 +19,9 @@ export type ProgressUpdate = z.infer<typeof ProgressUpdateSchema>;
 
 export const AssessmentSubmitSchema = z.object({
   assessed_level:  JLPTLevelSchema,
-  score:           z.number().int().min(0).max(7),
-  total_questions: z.number().int().min(1).max(7),
+  score:           z.number().int().min(0).max(7).optional(),
+  total_questions: z.number().int().min(1).max(7).optional(),
+  from_scratch:    z.boolean().optional(),
   completed_at:    z.date().optional(),
   onboarding_responses: z.object({
     source:     z.string().optional(),
@@ -28,7 +29,7 @@ export const AssessmentSubmitSchema = z.object({
     knowledge:  z.string().optional(),
     path:       z.enum(['from-scratch', 'find-my-level']).optional(),
   }).optional(),
-}).refine((d) => d.score <= d.total_questions, {
+}).refine((d) => !d.score || !d.total_questions || d.score <= d.total_questions, {
   message: 'score cannot exceed total_questions',
   path: ['score'],
 });

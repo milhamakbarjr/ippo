@@ -1,4 +1,4 @@
-import { Home01, BookOpen02, Trophy01, RefreshCw05, LetterSpacing01 } from '@untitledui/icons';
+import { Home01, BookOpen02, Trophy01, RefreshCw05, LetterSpacing01, CheckSquare, Edit05 } from '@untitledui/icons';
 import type { NavItemType } from '@/components/application/app-navigation/config';
 
 export const dashboardNavItems: NavItemType[] = [
@@ -10,4 +10,12 @@ export const dashboardNavItems: NavItemType[] = [
 
 export const dashboardFooterItems: NavItemType[] = [
   { label: 'Ambil Ulang Penilaian', href: '/onboarding', icon: RefreshCw05 },
+];
+
+export const adminNavItems: NavItemType[] = [
+  { label: 'Submission', href: '/admin/submissions', icon: CheckSquare },
+];
+
+export const contributorNavItems: NavItemType[] = [
+  { label: 'Submission Saya', href: '/contributor/submissions', icon: Edit05 },
 ];

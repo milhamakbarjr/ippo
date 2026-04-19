@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@/lib/auth-client';
 import { useAchievements } from '@/hooks/use-achievements';
 import { Tab, TabList, TabPanel, Tabs } from '@/components/application/tabs/tabs';
@@ -17,6 +18,18 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const { data: session, isPending } = authClient.useSession();
   const isAuthenticated = !!session?.user;
+
+  // Fetch custom session to get assessed_level + onboarding_completed — authClient.useSession() only has Better Auth fields
+  const { data: customSession, isLoading: isCustomSessionLoading } = useQuery({
+    queryKey: ['session-role'],
+    queryFn: async () => {
+      const res = await fetch('/api/auth/session');
+      return res.json() as Promise<{ user: { role?: string; assessed_level?: string; onboarding_completed?: boolean } | null }>;
+    },
+    staleTime: 1000 * 30,
+    enabled: isAuthenticated,
+  });
+
   const { data: achievementsData } = useAchievements(isAuthenticated);
 
   // Initialize stable; hydrate from sessionStorage after mount (SSR-safe)
@@ -33,44 +46,54 @@ export function DashboardPage() {
     } catch { /* ignore */ }
   }, []);
 
-  // Sync selected level from session once loaded
+  // Sync selected level from custom session once loaded (authClient.useSession doesn't have assessed_level)
   useEffect(() => {
-    if (!session?.user) return;
+    if (!customSession?.user) return;
     try {
       const stored = sessionStorage.getItem('user_level') as JLPTLevelId | null;
       if (!stored || !LEVEL_ORDER.includes(stored)) {
-        const dbLevel = (session.user as { assessed_level?: string }).assessed_level as JLPTLevelId | undefined;
+        const dbLevel = customSession.user.assessed_level as JLPTLevelId | undefined;
         if (dbLevel && LEVEL_ORDER.includes(dbLevel)) {
           setSelectedLevel(dbLevel);
           setUserLevel(dbLevel);
         }
       }
     } catch { /* ignore */ }
-  }, [session?.user]);
+  }, [customSession?.user]);
 
   // Scroll to top when switching level tabs
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [selectedLevel]);
 
-  // Gate: guest with no localStorage level, or authenticated with no level → onboarding
+  // Gate: guest with no localStorage level, or authenticated who hasn't completed onboarding → onboarding
   useEffect(() => {
-    if (isPending) return; // still loading
+    if (isPending) return; // Better Auth session still loading
+    if (isAuthenticated && isCustomSessionLoading) return; // wait for DB session before deciding
+
     const localLevel = (() => { try { return localStorage.getItem('assessment_level'); } catch { return null; } })();
+
+    if (!isAuthenticated) {
+      // Guest: must have assessment_level in localStorage
+      if (!localLevel) void navigate({ to: '/onboarding', search: { step: 'welcome' } });
+      return;
+    }
+
+    // Authenticated: check onboarding_completed flag (source of truth)
+    const onboardingDone = customSession?.user?.onboarding_completed;
+    if (!onboardingDone) {
+      void navigate({ to: '/onboarding', search: { step: 'welcome' } });
+      return;
+    }
+
+    // Sync assessed_level to localStorage if missing (new device / cleared storage)
     if (!localLevel) {
-      if (!isAuthenticated) {
-        void navigate({ to: '/onboarding', search: { step: 'welcome' } });
-      } else {
-        const dbLevel = (session?.user as { assessed_level?: string } | undefined)?.assessed_level;
-        if (!dbLevel) {
-          void navigate({ to: '/onboarding', search: { step: 'welcome' } });
-        } else {
-          // Write DB level to localStorage so future loads skip this check
-          try { localStorage.setItem('assessment_level', dbLevel); } catch { /* ignore */ }
-        }
+      const dbLevel = customSession?.user?.assessed_level;
+      if (dbLevel) {
+        try { localStorage.setItem('assessment_level', dbLevel); } catch { /* ignore */ }
       }
     }
-  }, [isPending, isAuthenticated, session, navigate]);
+  }, [isPending, isAuthenticated, isCustomSessionLoading, customSession, navigate]);
   const streak = achievementsData?.streak;
 
   return (

@@ -109,11 +109,12 @@ export const Route = createFileRoute('/api/auth/verify-otp')({
             JSON.stringify({
               success: true,
               user: {
-                id:             updatedUser.id,
-                email:          updatedUser.email,
-                name:           updatedUser.name,
-                assessed_level: updatedUser.assessed_level,
-                language:       updatedUser.preferred_language ?? 'id',
+                id:                   updatedUser.id,
+                email:                updatedUser.email,
+                name:                 updatedUser.name,
+                assessed_level:       updatedUser.assessed_level,
+                onboarding_completed: updatedUser.onboarding_completed,
+                language:             updatedUser.preferred_language ?? 'id',
               },
               migration: migrationResult,
             }),

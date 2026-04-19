@@ -7,7 +7,7 @@ import { Button } from '@/components/base/buttons/button';
 
 type VerifyOtpResponse = {
   success: boolean;
-  user: { id: string; email: string; assessed_level: string | null };
+  user: { id: string; email: string; assessed_level: string | null; onboarding_completed: boolean };
   migration: { success: boolean; migratedSteps: number; assessmentMigrated: boolean; error?: string } | null;
   message?: string;
 };
@@ -57,7 +57,7 @@ export function VerifyOtpPage() {
         toast.error('Migrasi gagal. Hubungi support jika ini terus terjadi.', { duration: 8000 });
       }
 
-      // Write assessment signal to localStorage so dashboard gate works
+      // Write assessment signal to localStorage so guest-side checks work
       if (data.user.assessed_level) {
         try {
           localStorage.setItem('assessment_level', data.user.assessed_level);
@@ -65,9 +65,13 @@ export function VerifyOtpPage() {
         } catch {
           // ignore storage errors
         }
-        void navigate({ to: '/' });
+      }
+
+      // Hard navigate so authClient.useSession() re-initializes with the new session cookie
+      if (data.user.onboarding_completed) {
+        window.location.href = '/';
       } else {
-        void navigate({ to: '/onboarding', search: { step: 'welcome' } });
+        window.location.href = '/onboarding?step=welcome';
       }
     } catch {
       toast.error('Verifikasi gagal. Coba lagi.');

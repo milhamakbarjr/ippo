@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
-import { db } from '@/db';
+import { db, txDb } from '@/db';
 import { progress, users } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
 import { requireAuth, isAuthError } from '@/server/auth-guard';
@@ -53,7 +53,7 @@ export const Route = createFileRoute('/api/progress/complete')({
 
         // 4–7. Atomically check completion, upsert progress, and award XP in a
         // single transaction to prevent double-awarding XP on concurrent requests.
-        const { alreadyCompleted, xpAwarded, totalXP } = await db.transaction(async (tx) => {
+        const { alreadyCompleted, xpAwarded, totalXP } = await txDb.transaction(async (tx) => {
           const existing = await tx
             .select({ completed: progress.completed })
             .from(progress)
